@@ -42,6 +42,7 @@ import { EditDeleteComponent } from './components/edit-delete/edit-delete.compon
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { DetallesLibroComponent } from './pages/detalles-libro/detalles-libro.component';
 import { RegisterModalComponent } from './components/modals/register-modal/register-modal.component';
+import { RatingComponent } from './components/rating/rating.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +78,7 @@ import { RegisterModalComponent } from './components/modals/register-modal/regis
     PaginationComponent,
     DetallesLibroComponent,
     RegisterModalComponent,
+    RatingComponent,
   ],
   imports: [
     BrowserModule,

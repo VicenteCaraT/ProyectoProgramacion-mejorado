@@ -54,21 +54,19 @@ export class DetallesLibroComponent implements OnInit{
 
   solicitarPrestamo(): void {
     const tokenUserId = localStorage.getItem('user_id');
-    const tokenJWT = localStorage.getItem('token'); // Suponiendo que el JWT se almacena como 'token'
+    const tokenJWT = localStorage.getItem('token');
   
     if (!tokenUserId || !tokenJWT) {
       const dialogRef = this.dialog.open(RegisterModalComponent, {
         width: '400px',
-        data: { message: 'Para solicitar un préstamo, debe registrarse o iniciar sesión.' }
       });
   
       dialogRef.afterClosed().subscribe(result => {
         if (result === 'signup') {
-          // Redirigir al usuario al formulario de registro
           this.router.navigate(['/signup']);
         }
       });
-      return; // Salir de la función si no hay token
+      return;
     }
   
     const fechaActual = new Date();

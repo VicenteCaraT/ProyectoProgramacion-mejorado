@@ -6,11 +6,9 @@
     <p class="card-text">Editorial: {{ book.editorial }}</p>
     <p class="card-text">Genero: {{ book.genero }}</p>
         <div class="d-flex justify-content-between align-items-center">
-            <span class="review-rating">
-                <i class="fas fa-star"></i> {{ book.rating }}
-            </span>
+        <app-rating [valor]="book.promedio_valoracion"></app-rating>
             <span class="save-icon">
-                <i class="fas fa-bookmark"></i>
+            <i class="fas fa-bookmark"></i>
             </span>
         </div>
     </div>

@@ -7,9 +7,8 @@
         <p class="synopsis">{{ book.sinopsis }}</p>
         <div class="rating-save d-flex align-items-center">
             <div class="rating me-2">
-                <i *ngFor="let star of [].constructor(book.rating); let j = index" class="fas fa-star"></i>
+                <app-rating [valor]="book.promedio_valoracion"></app-rating>
             </div>
-            <span class="reviews">({{ book.reviews }} reseñas)</span>
         </div>
         <div class="save-icon ms-auto">
             <i class="fas fa-bookmark"></i>

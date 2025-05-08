@@ -14,6 +14,7 @@
             <div class="book-info text-center text-md-start">
                 <h2 class="book-titulo">{{ book.titulo }}</h2>
                 <p class="autor">by {{ book.autor[0].apodo }}</p>
+                <app-rating [valor]="book.promedio_valoracion"></app-rating>
                 
                 <p class="descripcion mt-3 text-justify">
                     {{ book.sinopsis }}
