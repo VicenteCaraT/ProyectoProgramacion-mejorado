@@ -1,15 +1,18 @@
-<div class="card h-100" tabindex="0" (click)="cardClick()">
-    <img [src]="book.img" class="card-img-top" [alt]="book.titulo">
-    <div class="card-body text-center">
-    <h5 class="card-title" style="color: #F5F378;">{{ book.titulo }}</h5>
-    <p class="card-text" *ngIf="book.autor && book.autor.length > 0">Autor: {{ book.autor[0].apodo }}</p>
-    <p class="card-text">Editorial: {{ book.editorial }}</p>
-    <p class="card-text">Genero: {{ book.genero }}</p>
-        <div class="d-flex justify-content-between align-items-center">
-        <app-rating [valor]="book.promedio_valoracion"></app-rating>
-            <span class="save-icon">
-            <i class="fas fa-bookmark"></i>
-            </span>
+<div class="card h-100 shadow-sm" tabindex="0" (click)="cardClick()">
+    <img [src]="book.img" class="card-img-top" [alt]="book.titulo" style="object-fit: cover; height: 250px;">
+    
+    <div class="card-body d-flex flex-column justify-content-between text-center p-3">
+        <div>
+            <h5 class="card-title mb-2 fw-bold" style="color: #f5f378;">{{ book.titulo }}</h5>
+            <p class="card-text mb-1" *ngIf="book.autor?.length">Autor: {{ book.autor[0].apodo }}</p>
+            <p class="card-text mb-1">Editorial: {{ book.editorial }}</p>
+            <p class="card-text mb-3">Género: {{ book.genero }}</p>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-auto">
+            <app-rating [valor]="book.promedio_valoracion"></app-rating>
+                <div class="save-icon ms-auto">
+                    <i class="fas fa-bookmark"></i>
+                </div>
         </div>
     </div>
 </div>

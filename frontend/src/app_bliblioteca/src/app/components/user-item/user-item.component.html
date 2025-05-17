@@ -10,9 +10,9 @@
             <p *ngIf="review.usuario?.user">Usuario: {{ review.usuario.user }}</p>
             <p>Comentario: {{ review.descripcion }}</p>
             <div class="rating me-2">
-                <p>Rating: </p>
+                <p>Valoracion: </p>
                 <!-- Calificación de estrellas -->
-                <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]; let i = index" [ngClass]="{'active-star': i < review.valoracion}"></i>
+                <p>{{review.valoracion}}</p>
             </div>
         </div>
         <div class="ms-auto mt-3 mt-md-0">

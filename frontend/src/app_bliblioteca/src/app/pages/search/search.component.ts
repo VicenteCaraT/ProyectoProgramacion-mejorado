@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -10,7 +11,11 @@ export class SearchComponent {
   showDropdown: boolean = false;
   searchResults: any[] = [];
 
-  constructor(private bookService: LibrosService) {}
+  constructor(private bookService: LibrosService, private router: Router) {}
+
+  goToBook(bookID: string) {
+    this.router.navigate(['/libro', bookID])
+  }
 
   handleSearch(query: string) {
     if (query) {
