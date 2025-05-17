@@ -2,8 +2,11 @@
     <nav class="navbar navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" (click)="checkUser($event)" style="cursor: pointer;">
-                <img [src]="user?.img" alt="User" class="rounded-circle me-2" width="40">
-                <span>{{ user?.nombre || 'Usuario' }}</span>
+                <img *ngIf="user?.img; else noUserIcon" [src]="user.img" class="rounded-circle me-2" width="40" alt="User Image">
+                <ng-template #noUserIcon>
+                    <i class="fas fa-user-circle me-2"></i>
+                </ng-template>
+                <span>{{ user?.nombre ||  'Log In' }}</span>
             </a>
             <div class="d-flex align-items-center ms-auto">
                 <a routerLink="/notificaciones">
