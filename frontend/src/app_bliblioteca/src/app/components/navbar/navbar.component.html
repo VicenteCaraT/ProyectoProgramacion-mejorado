@@ -28,7 +28,7 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <span class="ms-2">Search</span>
                     </a>
-                    <a class="nav-link d-flex align-items-center" routerLink="/save">
+                    <a *ngIf="isUser()" class="nav-link d-flex align-items-center" routerLink="/save">
                         <i class="fa-solid fa-bookmark"></i>
                         <span class="ms-2">Saved</span>
                     </a>
