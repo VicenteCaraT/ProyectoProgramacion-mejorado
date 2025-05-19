@@ -12,3 +12,5 @@ from .autor import Autor as AutorResource
 from .autor import Autores as AutoresResource
 from .reseña import Reseña as ReseñaResource
 from .reseña import Reseñas as ReseñasResource
+from .guardado import Guardado as GuardadoResourse
+from .guardado import Guardados as GuardadosResourse

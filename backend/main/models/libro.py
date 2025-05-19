@@ -16,6 +16,7 @@ class Libro(db.Model):
     genero = db.Column(db.String(60), nullable=False)
     sinopsis = db.Column(db.String(300), nullable=False)
     reseñas_libro = db.relationship("Reseña", back_populates="fk_libro_reseña", cascade="all, delete-orphan")
+    guardados_libro = db.relationship("Guardado", back_populates="fk_libro_guardado", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<id: {self.idLibro}, img: {self.book_img}, Titulo: {self.titulo}, Cantidad: {self.cantidad}, Autor: {self.fk_idAutor}, Editorial: {self.editorial}, Genero: {self.genero}, Sinopsis: {self.sinopsis}>"

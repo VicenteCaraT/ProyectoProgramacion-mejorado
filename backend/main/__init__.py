@@ -43,6 +43,8 @@ def create_app():
     api.add_resource(resources.AutoresResource, '/autores')
     api.add_resource(resources.ReseñaResource, '/reseña/<id>')
     api.add_resource(resources.ReseñasResource, '/reseñas')
+    api.add_resource(resources.GuardadoResourse, '/guardado/<id>')
+    api.add_resource(resources.GuardadosResourse, '/guardados')
     api.init_app(app)
     #config jwt
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
