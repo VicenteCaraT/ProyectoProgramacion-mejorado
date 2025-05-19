@@ -13,6 +13,19 @@ from main.auth.decorators import role_required
 
 class Notificacion(Resource):
     @role_required(roles=["Admin", "Usuario"])
+    def get(self, id):
+        notificacion = db.session.query(NotificacionModel).get_or_404(id)
+        return notificacion.to_json()
+
+    @role_required(roles=["Admin", "Usuario"])
+    def delete(self, id):
+        notificacion = db.session.query(NotificacionModel).get_or_404(id)
+        db.session.delete(notificacion)
+        db.session.commit()
+        return '', 204
+
+class Notificaciones(Resource):
+    @role_required(roles=["Admin", "Usuario"])
     def get(self):
         page = 1
 

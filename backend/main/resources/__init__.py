@@ -7,6 +7,7 @@ from .libro import Libros as LibrosResource
 from .prestamo import Prestamo as PrestamoResource
 from .prestamo import Prestamos as PrestamosResource
 from .notificacion import Notificacion as NotifacionResource
+from.notificacion import Notificaciones as NotificacionesResourse
 from .autor import Autor as AutorResource
 from .autor import Autores as AutoresResource
 from .reseña import Reseña as ReseñaResource
