@@ -4,8 +4,6 @@
         <h3>{{ book.titulo }}</h3>
         <p *ngIf="book.autor && book.autor.length">Autor: {{ book.autor[0].apodo }}</p>
         <p class="book-quantity">Cantidad disponible: {{ book.cantidad }}</p>
-    </div>
-    <div class="edit-delete d-flex">
         <app-edit-delete (editDelete)="handleEditDelete($event)"></app-edit-delete>
     </div>
 </div>
