@@ -58,21 +58,25 @@ class Guardados(Resource):
     def post(self):
         data = request.get_json()
         current_user_id = get_jwt_identity()
-        
-        # Verificar si el libro ya ha sido guardado anteriormente
+        libro_id = data.get("libro")
+
+        if not libro_id:
+            return {"message": "Falta el ID del libro."}, 400
+
+        # Verificar si ya está guardado por el mismo usuario
         existente = GuardadoModel.query.filter_by(
             fk_idUser=current_user_id,
-            fk_idLibro=data.get("libro")
+            fk_idLibro=libro_id
         ).first()
-        
+
         if existente:
-            return {"message": "El libro ya fue guardado previamente."}, 409
-        
+            return {"message": "Este libro ya fue guardado por el usuario actual."}, 409
+
         nuevo_guardado = GuardadoModel(
             fk_idUser=current_user_id,
-            fk_idLibro=data.get("libro")
+            fk_idLibro=libro_id
         )
         db.session.add(nuevo_guardado)
         db.session.commit()
-        
+
         return nuevo_guardado.to_json(), 201
