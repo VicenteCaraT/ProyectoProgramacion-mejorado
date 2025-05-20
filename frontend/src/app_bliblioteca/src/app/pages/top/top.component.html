@@ -12,7 +12,8 @@
         <section class="top-books">
             <app-book-item
                 *ngFor="let book of bookList"
-                [book]="book">
+                [book]="book"
+                (click)="goToBook(book.id)">
             </app-book-item>
         </section>
     </div>

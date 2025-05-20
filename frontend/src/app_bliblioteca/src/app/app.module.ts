@@ -44,6 +44,7 @@ import { DetallesLibroComponent } from './pages/detalles-libro/detalles-libro.co
 import { RegisterModalComponent } from './components/modals/register-modal/register-modal.component';
 import { RatingComponent } from './components/rating/rating.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LibrosService } from '../../services/books/libros.service';
+import { GuardadosService } from '../../services/saves/guardados.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-save',
@@ -7,46 +8,29 @@ import { LibrosService } from '../../services/books/libros.service';
   styleUrl: './save.component.css'
 })
 export class SaveComponent implements OnInit{
-  // savedBooks = [
-  //   {
-  //     title: 'El señor de los Anillos',
-  //     author: 'J.R.R. Tolkien',
-  //     synopsis: 'Una épica de J.R.R. Tolkien donde Frodo Bolsón y sus compañeros intentan destruir un anillo maldito para salvar al mundo de la oscuridad.',
-  //     image: 'assets/señor_d_a.jpeg',
-  //     rating: 5,
-  //     reviews: 392,
-  //   },
-  //   {
-  //     title: 'El Código Da Vinci',
-  //     author: 'Dan Brown',
-  //     synopsis: 'Un thriller en el que un profesor de simbología investiga un asesinato en el Louvre y descubre un misterio que podría cambiar la historia.',
-  //     image: 'assets/codigo_d.jpeg',
-  //     rating: 5,
-  //     reviews: 235,
-  //   },
-  //   {
-  //     title: 'Alicia en el País de Las Maravillas',
-  //     author: 'Lewis Carroll',
-  //     synopsis: 'Una joven llamada Alicia cae en un mundo fantástico lleno de personajes y situaciones absurdas, donde vive una serie de aventuras surrealistas.',
-  //     image: 'assets/alicia.jpeg',
-  //     rating: 5,
-  //     reviews: 281,
-  //   },
-  // ];
+  bookList: any[] = [];
+  filteredBook: any[] = [];
 
   constructor(
-    private bookService: LibrosService,
+    private guardadosService: GuardadosService,
+    private router: Router
   ) {}
 
-  bookList:any[] = []
-  filteredBook:any = []
-
   ngOnInit(): void {
-    this.bookService.getBooks(1).subscribe((rta: any) => {
-      console.log("Libros Api: ", rta);
-      this.bookList = rta.usuarios || [];
-      this.filteredBook = [...this.bookList]
-    })
-}
-  
+    const userId = localStorage.getItem('user_id') ?? undefined;
+    this.guardadosService.getSaves(1, { idUsuario: userId }).subscribe({
+      next: (res: any) => {
+        console.log("Guardados:", res);
+        this.bookList = res.guardados.map((item: any) => item.libro);
+        this.filteredBook = [...this.bookList];
+      },
+      error: (err) => {
+        console.error("Error al obtener guardados:", err);
+      }
+    });
+  }
+
+    goToBook(bookID: string) {
+    this.router.navigate(['/libro', bookID])
+  }
 }

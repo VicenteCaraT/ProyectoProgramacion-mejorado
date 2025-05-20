@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-top',
@@ -39,6 +40,7 @@ export class TopComponent implements OnInit{
 
   constructor(
     private bookService: LibrosService,
+    private router: Router
   ) {}
 
   bookList:any[] = []
@@ -50,5 +52,8 @@ export class TopComponent implements OnInit{
       this.bookList = rta.libros || [];
       this.filteredBook = [...this.bookList]
     })
-}
+  }
+    goToBook(bookID: string) {
+    this.router.navigate(['/libro', bookID])
+  }
 }
