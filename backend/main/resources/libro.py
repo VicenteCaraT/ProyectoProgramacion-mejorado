@@ -43,52 +43,50 @@ class Libro(Resource):
         return '', 204
 
 class Libros(Resource):
-    # cambiado jwt ya que un usuario sin rol puede ingresar al home y ver libros
-    # @jwt_required(optional=True)
     def get(self):
-        page = 1
-        per_page = 10
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
 
-        libros = db.session.query(LibroModel)
-
-        if request.args.get('page'):
-            page = int(request.args.get('page'))
-        if request.args.get('per_page'):
-            per_page = int(request.args.get('per_page'))
+        libros_query = db.session.query(LibroModel)
 
         ### FILTROS ###
         genero = request.args.get("genero")
         autor = request.args.get("autor")
         titulo = request.args.get("titulo")
         editorial = request.args.get("editorial")
-        
-        
-        #genero
+        orden = request.args.get("orden")
+        # Filtros de búsqueda
         if genero:
-            libros=libros.filter(LibroModel.genero.like("%"+genero+"%"))
-        
-        #autor 
+            libros_query = libros_query.filter(LibroModel.genero.like(f"%{genero}%"))
         if autor:
             autor_id = AutorModel.query.get_or_404(autor)
-            libros=libros.filter(LibroModel.fk_idAutor.contains(autor_id))
-
-        #titulo
+            libros_query = libros_query.filter(LibroModel.fk_idAutor.contains(autor_id))
         if titulo:
-            libros = libros.filter(LibroModel.titulo.like("%"+titulo+"%"))
-
-        #editorial
+            libros_query = libros_query.filter(LibroModel.titulo.like(f"%{titulo}%"))
         if editorial:
-            libros = libros.filter(LibroModel.editorial.like("%"+editorial+"%"))
+            libros_query = libros_query.filter(LibroModel.editorial.like(f"%{editorial}%"))
+            
+        # Ordenar por ranking dinámico (promedio_valoracion)
+        libros = libros_query.all()
+        if orden == "ranking":
+            libros.sort(
+                key=lambda libro: (
+                    sum([float(r.valoracion.split('/')[0]) for r in libro.reseñas_libro]) / len(libro.reseñas_libro)
+                    if libro.reseñas_libro else 0
+                ),
+                reverse=True
+            )
+            
+        # Paginado manual
+        total = len(libros)
+        pages = (total + per_page - 1) // per_page
+        libros_paginados = libros[(page - 1) * per_page : page * per_page]
 
-
-        ### FIN FILTROS ###
-
-        libros = libros.paginate(page=page, per_page=per_page, error_out=True)
-
-        return jsonify({'libros' : [libro.to_json() for libro in libros],
-                    'total' : libros.total,
-                    'pages' : libros.pages,
-                    'page' : page
+        return jsonify({
+            'libros': [libro.to_json() for libro in libros_paginados],
+            'total': total,
+            'pages': pages,
+            'page': page
         })
     
     @role_required(roles=["Admin"])
