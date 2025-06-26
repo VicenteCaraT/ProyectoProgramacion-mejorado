@@ -18,6 +18,8 @@ export class HomeComponent implements OnInit{
   ) {}
 
   bookList:any[] = []
+  harryPotterBooks:any[] = [];
+  fantasyBooks:any[] = [];
 
   filteredBooks:any = []
 
@@ -26,6 +28,16 @@ export class HomeComponent implements OnInit{
       console.log("Libros Api: ", rta);
       this.bookList = rta.libros || [];
       this.filteredBooks = [...this.bookList]
+    })
+    //libros Harry Potter
+    this.bookService.getBooks(1, {titulo:'Harry'}).subscribe((rta: any) => {
+      console.log("Harry Potter Libros:", rta);
+      this.harryPotterBooks = rta.libros || []
+    })
+    //libros de Fantasía
+        this.bookService.getBooks(1, {genero:'Fanta'}).subscribe((rta: any) => {
+      console.log("Fantasy Books:", rta);
+      this. fantasyBooks= rta.libros || []
     })
 }
 
