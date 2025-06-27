@@ -10,9 +10,7 @@
         </div>
         <div class="d-flex justify-content-between align-items-center mt-auto">
             <app-rating [valor]="book.promedio_valoracion"></app-rating>
-                <div class="save-icon ms-auto">
-                    <i class="fas fa-bookmark"></i>
-                </div>
+            <app-save-icon [libroID]="book.id" class="home-card-save"></app-save-icon>
         </div>
     </div>
 </div>

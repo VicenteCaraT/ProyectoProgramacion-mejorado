@@ -41,5 +41,5 @@ export class LoanItemComponent {
       console.error('Datos del libro no disponibles:', this.loan);
     }
   }
-
+  
 }

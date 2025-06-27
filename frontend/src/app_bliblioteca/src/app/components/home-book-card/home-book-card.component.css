@@ -1,25 +1,3 @@
-/* Estilos para la reseña con estrellas */
-.review-rating {
-    color: #ffdd57; 
-    font-size: 14px;
-}
-
-.review-rating i {
-    margin-right: 5px;
-}
-
-/* Estilo del icono de guardar */
-.save-icon {
-    color: #f1f1f1;
-    font-size: 18px;
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.save-icon:hover {
-    color: #f5c542; 
-}
-
 /* Cards */
 .card {
     background-color: #444 !important; 

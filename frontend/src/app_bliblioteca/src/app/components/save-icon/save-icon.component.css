@@ -1,0 +1,16 @@
+/* Estilo del icono de guardar */
+.save-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: #f1f1f1;
+    font-size: 28px; /* Agrandado */
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+    z-index: 10;
+}
+
+.save-icon:hover {
+    color: #f5c542;
+    transform: scale(1.1); /* Agranda levemente al pasar el mouse */
+}

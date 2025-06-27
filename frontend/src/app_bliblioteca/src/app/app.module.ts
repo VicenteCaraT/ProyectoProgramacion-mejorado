@@ -43,6 +43,7 @@ import { PaginationComponent } from './components/pagination/pagination.componen
 import { DetallesLibroComponent } from './pages/detalles-libro/detalles-libro.component';
 import { RegisterModalComponent } from './components/modals/register-modal/register-modal.component';
 import { RatingComponent } from './components/rating/rating.component';
+import { SaveIconComponent } from './components/save-icon/save-icon.component';
 
 
 @NgModule({
@@ -80,6 +81,7 @@ import { RatingComponent } from './components/rating/rating.component';
     DetallesLibroComponent,
     RegisterModalComponent,
     RatingComponent,
+    SaveIconComponent,
   ],
   imports: [
     BrowserModule,

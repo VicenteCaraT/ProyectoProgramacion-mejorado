@@ -7,6 +7,7 @@ import { first } from 'rxjs';
 })
 export class GuardadosService {
   url = '/api'
+  private guardadosLibroIds: number[] = [];
 
   constructor(
     private httpClient: HttpClient,

@@ -7,7 +7,7 @@
 </div>
 <div class="container mt-4 d-flex">
     <div class="libro-container p-4 rounded shadow">
-        <div class="book-detail d-flex flex-md-row flex-column align-items-center p-4">
+        <div class="book-detail d-flex flex-md-row flex-column align-items-center p-4 position-relative">
             <div class="libro-pic me-md-4 mb-3 mb-md-0">
                 <img [src]="book.img" alt="{{ book.titulo }}" class="img-fluid rounded" style="max-width: 300px; height: auto;">
             </div>
@@ -25,6 +25,9 @@
                     <span class="genero badge bg-secondary"> Género: {{ book.genero }}</span>
                 </div>
                 <button class="btn btn-warning mt-3" (click)="solicitarPrestamo()">Solicitar Préstamo</button>
+            </div>
+            <div class="save-icon">
+                <app-save-icon [libroID]="book.id"></app-save-icon>
             </div>
         </div>
         <!--Agregar paginación a las reseñas-->
