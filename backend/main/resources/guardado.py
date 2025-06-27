@@ -43,7 +43,7 @@ class Guardados(Resource):
             
         #libro
         if libro:
-            guardados = guardados.filte(GuardadoModel.fk_idLibro == libro)
+            guardados = guardados.filter(GuardadoModel.fk_idLibro == libro)
         
         
         guardados = guardados.paginate(page=page, per_page=per_page, error_out=True)
