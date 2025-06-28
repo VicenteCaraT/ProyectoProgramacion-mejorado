@@ -5,6 +5,7 @@ import { PrestamosService } from '../../services/loans/prestamos.service';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
 import { RegisterModalComponent } from '../../components/modals/register-modal/register-modal.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 
 @Component({
   selector: 'app-detalles-libro',
@@ -21,7 +22,8 @@ export class DetallesLibroComponent implements OnInit{
     private reviewService: ReseñasService,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private sysNotificationService: SysNotificationService
   ) {}
 
   ngOnInit(): void {
@@ -91,14 +93,14 @@ export class DetallesLibroComponent implements OnInit{
       estado: 'Pendiente' 
     };
   
-    this.loanService.postLoan(prestamoData).subscribe(
-      response => {
-        console.log('Préstamo solicitado con éxito:', response);
+    this.loanService.postLoan(prestamoData).subscribe({
+      next: () => {
+        this.sysNotificationService.showSuccess('Préstamo solicitado con éxito')
       },
-      error => {
-        console.error('Error al solicitar el préstamo:', error);
+      error: () => {
+        this.sysNotificationService.showError('Error al solicitar el préstamo')
       }
-    );
+    });
   }
   goBack(): void {
     this.router.navigate(['/search']);

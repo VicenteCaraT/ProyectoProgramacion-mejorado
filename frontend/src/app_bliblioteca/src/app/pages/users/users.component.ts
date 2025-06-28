@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { UsuariosService } from '../../services/users/usuarios.service';
 import { catchError, of, race, tap } from 'rxjs';
+import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 
 @Component({
   selector: 'app-users',
@@ -13,7 +14,8 @@ export class UsersComponent implements OnInit{
 
   constructor(
     private dialog: MatDialog,
-    private usuarioService: UsuariosService
+    private usuarioService: UsuariosService,
+    private sysNotificationService: SysNotificationService
   ) {}
 
   usersList:any[] = [];
@@ -60,12 +62,14 @@ export class UsersComponent implements OnInit{
     } else if (event.action === 'delete' || event.action === 'decline') {
       this.usuarioService.deleteUser(event.user.id).subscribe({
         next: () => {
+          this.sysNotificationService.showSuccess('Usuario eliminado correctamente')
           this.refreshUserList();
         },
         error: (err) => {
           console.error('Error al eliminar el usuario', err)
+          this.sysNotificationService.showError('Error al eliminar el usuario')
         }
-      })
+      });
     }
   }
 
@@ -81,18 +85,30 @@ export class UsersComponent implements OnInit{
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (operation === 'create') {
-          this.usuarioService.postUser(result).subscribe(() => {
-            this.refreshUserList();
+          this.usuarioService.postUser(result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Usuario creado correctamente')
+              this.refreshUserList();
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al crear el usuario')
+            }
           });
         } else if (result) {
           if (operation === 'edit') {
-            this.usuarioService.updateUser(userData.id, result).subscribe(() => {
-              this.refreshUserList();
+            this.usuarioService.updateUser(userData.id, result).subscribe({
+              next: () => {
+                this.sysNotificationService.showSuccess('Usuario editado correctamente')
+                this.refreshUserList();
+              },
+              error: () => {
+                this.sysNotificationService.showError('Error al editar el usuario')
+              }
             });
           }
         }
       }
-    })
+    });
   }
 
   refreshUserList(): void {

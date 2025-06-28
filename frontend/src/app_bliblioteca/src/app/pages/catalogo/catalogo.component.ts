@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { LibrosService } from '../../services/books/libros.service';
+import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 
 @Component({
   selector: 'app-catalogo',
@@ -13,6 +14,7 @@ export class CatalogoComponent implements OnInit{
   constructor(
     private dialog: MatDialog,
     private bookService: LibrosService,
+    private sysNotificationService: SysNotificationService
   ) {}
 
   bookList:any[] = []
@@ -53,11 +55,12 @@ export class CatalogoComponent implements OnInit{
     } else if (event.action === 'delete') {
       this.bookService.deleteBook(event.book.id).subscribe({
         next: () => {
-          console.log('Libro eliminado con éxito');
+          this.sysNotificationService.showSuccess('Libro eliminado correctamente')
           this.refreshBookList();
         },
         error: (err) => {
           console.error('Error al eliminar el libro', err)
+          this.sysNotificationService.showError('Error al eliminar el libro')
         }
       })
     }
@@ -77,13 +80,25 @@ export class CatalogoComponent implements OnInit{
       
       if(result) {
         if (operation == 'create') {
-          this.bookService.postBook(result).subscribe(() => {
-            this.refreshBookList();
+          this.bookService.postBook(result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Libro creado correctamente')
+              this.refreshBookList();
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al crear el libro')
+            }
           });
         } else if (operation === 'edit') {
-          this.bookService.updateBook(bookData.id, result).subscribe(() => {
-            this.refreshBookList();
-          })
+          this.bookService.updateBook(bookData.id, result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Libro editado correctamente')
+              this.refreshBookList();
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al editar el libro')
+            }
+          });
         }
       }
     });

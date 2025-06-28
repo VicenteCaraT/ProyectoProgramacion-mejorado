@@ -4,6 +4,7 @@ import { CrearResenaComponent } from '../../components/modals/user-modals/crear-
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { PrestamosService } from '../../services/loans/prestamos.service';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
+import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 
 
 @Component({
@@ -16,7 +17,9 @@ export class PrestamoComponent implements OnInit{
   constructor(
     private dialog: MatDialog,
     private loanService: PrestamosService,
-    private reviewService: ReseñasService
+    private reviewService: ReseñasService,
+    private sysNotificationService: SysNotificationService
+
   ) {}
 
   loanList:any[] = []
@@ -65,10 +68,12 @@ export class PrestamoComponent implements OnInit{
     } else if (event.action === 'delete' || event.action === 'decline') {
       this.loanService.deleteLoan(event.loan.id).subscribe({
         next: () => {
+          this.sysNotificationService.showSuccess('Prestamo eliminado correctamente')
           this.refreshLoanList();
         },
         error: (err) => {
           console.error('Error al eliminar el prestamo', err)
+          this.sysNotificationService.showError('Error al eliminar el préstamo')
         }
       })
     }
@@ -88,13 +93,25 @@ export class PrestamoComponent implements OnInit{
       // arreglar porque al apretar close se hace el post igual
       if (result) {
         if (operation === 'create') {
-          this.loanService.postLoan(result).subscribe(() => {
-            this.refreshLoanList();
+          this.loanService.postLoan(result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Préstamo creado correctamente')
+              this.refreshLoanList();
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al crear el préstamo')
+            }
           });
         } else if (operation === 'edit') {
-          this.loanService.updateLoan(loanData.id, result).subscribe(() => {
-            this.refreshLoanList();
-          })
+          this.loanService.updateLoan(loanData.id, result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Préstamo editado correctamente')
+              this.refreshLoanList();
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al editar el préstamo')
+            }
+          });
         }
       }
     })
@@ -153,12 +170,11 @@ export class PrestamoComponent implements OnInit{
     this.loanService.updateLoan(loan.id, { estado: 'Activo' }).subscribe({
       next: () => {
         loan.estado = 'Activo';
+        this.sysNotificationService.showSuccess('Préstamo aceptado correctamente');
       },
       error: (error) => {
         console.error('Error al aceptar el préstamo', error);
-      },
-      complete: () => {
-        console.log('Prestamo acceptado');
+        this.sysNotificationService.showError('Error al aceptar el préstamo');
       }
     });
   }

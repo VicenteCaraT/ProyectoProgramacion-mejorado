@@ -39,15 +39,24 @@ export class SaveIconComponent implements OnInit {
   }
   
   toggleSave(): void {
-    if (this.isSaved && this.savedID !== null) {
+    if (this.isSaved) {
+      if (this.savedID === null) {
+        console.warn('Guardado aún no está cargado completamente.');
+        return;
+      }
+
       this.saveService.deleteSave(this.savedID).subscribe(() => {
         this.isSaved = false;
         this.savedID = null;
+      }, (err) => {
+        console.error('Error al eliminar el guardado', err);
       });
     } else {
       this.saveService.postSaves({ libro: this.libroID }).subscribe((rta: any) => {
         this.isSaved = true;
-        this.savedID = rta.id;
+        this.savedID = rta.guardado?.id;
+      }, (err) => {
+        console.error('Error al guardar el libro', err);
       });
     }
   }
