@@ -5,17 +5,20 @@ from main.models import ReseñaModel, UsuarioModel, LibroModel
 import regex
 from datetime import datetime
 from sqlalchemy import func, desc, asc
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 #implementar envio de mail
 
 class Reseña(Resource):
+    
+    @handle_errors
     @jwt_required(optional=True)
     def get(self, id):
         reseña = db.session.query(ReseñaModel).get_or_404(id)
         return reseña.to_json()
     
+    @handle_errors
     @role_required(roles=["Usuario"])
     # el usuario se puede modificar, solo a si mismo
     def put(self, id):
@@ -43,8 +46,12 @@ class Reseña(Resource):
 
         db.session.add(reseña)
         db.session.commit()
-        return reseña.to_json(), 201
-
+        return {
+            "message": f"Reseña con ID {id} actualizada correctamente.",
+            "prestamo": reseña.to_json()
+        }, 200
+        
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     # el usuario puede borrar la reseña, solo a si mismo
     # el admin o bibliotecario puede borrar cualquiera
@@ -61,6 +68,7 @@ class Reseña(Resource):
 class Reseñas(Resource):
     # cambiado jwt ya que un usuario sin rol puede ingresar al home y ver libros
     # @jwt_required(optional=True)
+    @handle_errors
     def get(self):
         page = 1
         per_page = 10
@@ -111,14 +119,18 @@ class Reseñas(Resource):
                 'pages': reseñas.pages,
                 'page': page
                 })
-        
+    
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def post(self):
         reseña = ReseñaModel.from_json(request.get_json())
         db.session.add(reseña)
         db.session.commit()
         print(reseña)
-        return reseña.to_json()
+        return {
+            "message": "Reseña creada exitosamente.",
+            "reseña": reseña.to_json()
+        }, 201
     
 if __name__ == '__main__':
     pass

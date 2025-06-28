@@ -3,7 +3,7 @@ from flask import request, jsonify
 from .. import db
 from main.models import UsuarioModel
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 
 #USUARIOS = {
 #    1:{'Nombre':'Ricardo','Apellido':'Montes','DNI':44909938,'Telefono':2613123216, 'Email':'ricardito12@gmial.com', 'Rol':'Admin'},
@@ -12,6 +12,8 @@ from main.auth.decorators import role_required
 
 
 class Usuario(Resource): #arreglado
+    
+    @handle_errors
     @jwt_required(optional=True)
     def get(self, id):
         usuario = db.session.query(UsuarioModel).get_or_404(id)
@@ -21,6 +23,7 @@ class Usuario(Resource): #arreglado
         else:
             return usuario.to_json()
     
+    @handle_errors
     @role_required(roles = ["Admin", "Usuario"])
     def put(self, id): 
         current_user_id = get_jwt_identity()
@@ -32,8 +35,12 @@ class Usuario(Resource): #arreglado
             setattr(usuario, key, value)
         db.session.add(usuario)
         db.session.commit()
-        return usuario.to_json(), 200
+        return {
+            "message": f"Usuario con ID {id} actualizado correctamente.",
+            "usuario": usuario.to_json()
+        }, 200
     
+    @handle_errors
     @role_required(roles = ["Admin", "Usuario"])
     def delete(self, id):
         #el usuario puede borrarse solo a sí mismo pero un borrado lógico
@@ -44,10 +51,11 @@ class Usuario(Resource): #arreglado
             return {'message': 'No tiene permisos para borrar esta perfil'}, 403
         db.session.delete(usuario)
         db.session.commit()
-        return '', 204 # status code 204, no debe tener respuesta
+        return '', 204
 
 class Usuarios(Resource):
     
+    @handle_errors
     @jwt_required(optional=True)
     def get(self):
         page = 1
@@ -106,12 +114,16 @@ class Usuarios(Resource):
                     'page':page    
                         })
 
+    @handle_errors
     def post(self):
         usuario = UsuarioModel.from_json(request.get_json())
         db.session.add(usuario)
         db.session.commit()
         print(usuario)
-        return usuario.to_json(), 201
+        return {
+            "message": "Usuario creado exitosamente.",
+            "usuario": usuario.to_json()
+        }, 201
     
 if __name__ == '__main__':
     pass

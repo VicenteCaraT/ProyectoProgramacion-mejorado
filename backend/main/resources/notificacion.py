@@ -2,7 +2,7 @@ from flask_restful import Resource
 from flask import request, jsonify
 from .. import db
 from main.models import NotificacionModel
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 
 #NOTIFICACIONES = {
 #    1:{'Usuario':'facu','Notifacion':'Quedan X dias de prestamo'},
@@ -12,11 +12,14 @@ from main.auth.decorators import role_required
 #implementar envio de mail
 
 class Notificacion(Resource):
+    
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def get(self, id):
         notificacion = db.session.query(NotificacionModel).get_or_404(id)
         return notificacion.to_json()
 
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def delete(self, id):
         notificacion = db.session.query(NotificacionModel).get_or_404(id)
@@ -25,6 +28,8 @@ class Notificacion(Resource):
         return '', 204
 
 class Notificaciones(Resource):
+    
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def get(self):
         page = 1
@@ -57,13 +62,17 @@ class Notificaciones(Resource):
                     'page':page    
                         })
 
+    @handle_errors
     @role_required(roles=["Admin"])
     def post(self):
         notificacion = NotificacionModel.from_json(request.get_json())
         db.session.add(notificacion)
         db.session.commit()
         print(notificacion)
-        return notificacion.to_json()
+        return {
+            "message": "Notificación creada exitosamente.",
+            "notificacion": notificacion.to_json()
+        }, 201
 
 
 if __name__ == '__main__':

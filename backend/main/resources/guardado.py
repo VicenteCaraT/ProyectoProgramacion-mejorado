@@ -2,16 +2,18 @@ from flask_restful import Resource
 from flask import request, jsonify
 from .. import db
 from main.models import UsuarioModel, LibroModel, GuardadoModel
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 class Guardado(Resource):
     
+    @handle_errors
     @jwt_required()
     def get(self, id):
         guardado = db.session.query(GuardadoModel).get_or_404(id)
         return guardado.to_json()
     
+    @handle_errors
     @jwt_required()
     def delete(self, id):
         guardado = db.session.query(GuardadoModel).get_or_404(id)
@@ -20,6 +22,8 @@ class Guardado(Resource):
         return '', 204
     
 class Guardados(Resource):
+    
+    @handle_errors
     @jwt_required()
     def get(self):
         page = 1
@@ -53,7 +57,8 @@ class Guardados(Resource):
                     'pages': guardados.pages,
                     'page' : page
             })
-        
+    
+    @handle_errors
     @jwt_required()
     def post(self):
         data = request.get_json()
@@ -79,4 +84,7 @@ class Guardados(Resource):
         db.session.add(nuevo_guardado)
         db.session.commit()
 
-        return nuevo_guardado.to_json(), 201
+        return {
+            "message": "Libro guardado exitosamente.",
+            "guardado": nuevo_guardado.to_json()
+        }, 201

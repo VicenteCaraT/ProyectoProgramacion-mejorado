@@ -3,7 +3,7 @@ from flask import request, jsonify
 from .. import db
 from main.models import LibroModel, AutorModel
 from sqlalchemy import func, desc
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required
 
 #LIBROS = {
@@ -16,10 +16,12 @@ class Libro(Resource):
     
     # Cambiado el jwt ya que un usuario sin rol puede ingresar al home
     #@jwt_required(optional=True)
+    @handle_errors
     def get(self, id):
         libro = db.session.query(LibroModel).get_or_404(id)
         return libro.to_json()
     
+    @handle_errors
     @role_required(roles=["Admin"])
     def put(self, id):
         libro = db.session.query(LibroModel).get_or_404(id)
@@ -33,8 +35,12 @@ class Libro(Resource):
                 setattr(libro, key, value)
         db.session.add(libro)
         db.session.commit()
-        return libro.to_json() , 201
+        return {
+            "message": "Libro actualizado correctamente.",
+            "libro": libro.to_json()
+        }, 200
 
+    @handle_errors
     @role_required(roles=["Admin"])
     def delete(self, id):
         libro = db.session.query(LibroModel).get_or_404(id)
@@ -43,6 +49,8 @@ class Libro(Resource):
         return '', 204
 
 class Libros(Resource):
+    
+    @handle_errors
     def get(self):
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 10))
@@ -89,6 +97,7 @@ class Libros(Resource):
             'page': page
         })
     
+    @handle_errors
     @role_required(roles=["Admin"])
     def post(self):
         data = request.get_json()
@@ -100,11 +109,12 @@ class Libros(Resource):
                 autor_exist = [autor_exist]
             autores = AutorModel.query.filter(AutorModel.idAutor.in_(autor_exist)).all()
             libro.fk_idAutor.extend(autores)
-
         db.session.add(libro)
         db.session.commit()
-
-        return libro.to_json(), 201
-    
+        return {
+            "message": "Libro creado exitosamente.",
+            "libro": libro.to_json()
+        }, 201
+        
 if __name__ == '__main__':
     pass

@@ -5,7 +5,7 @@ from main.models import PrestamoModel, LibroModel, UsuarioModel
 import re
 from datetime import datetime, timedelta
 from sqlalchemy import func, desc
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 
 #PRESTAMOS = {
@@ -17,6 +17,7 @@ from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 
 class Prestamo(Resource):
     
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     # solo el usuario puede ver los prestamos de uno mismo
     # el admin y bibliotecario puede ver cualquiera
@@ -24,6 +25,7 @@ class Prestamo(Resource):
         prestamo = db.session.query(PrestamoModel).get_or_404(id)
         return prestamo.to_json()
 
+    @handle_errors
     @role_required(roles=["Admin"])
     def put(self, id):
         prestamo = db.session.query(PrestamoModel).get_or_404(id)
@@ -54,17 +56,22 @@ class Prestamo(Resource):
 
         db.session.add(prestamo)
         db.session.commit()
-        return prestamo.to_json(), 201
+        return {
+            "message": f"Préstamo con ID {id} actualizado correctamente.",
+            "prestamo": prestamo.to_json()
+        }, 200
     
+    @handle_errors
     @role_required(roles=["Admin"])
     def delete(self, id):
         prestamo = db.session.query(PrestamoModel).get_or_404(id)
         db.session.delete(prestamo)
         db.session.commit()
         return '', 204
-
+    
 class Prestamos(Resource):
     
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def get(self):
         page = 1
@@ -142,6 +149,7 @@ class Prestamos(Resource):
                     'page' : page
         })
 
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"]) #Cambiado para que el usuario pueda solicitar un prestamo
     def post(self):
         libro_exist = request.get_json().get("libro")
@@ -162,7 +170,10 @@ class Prestamos(Resource):
 
         db.session.add(prestamo)
         db.session.commit()
-        return prestamo.to_json()
+        return {
+            "message": "Préstamo creado exitosamente.",
+            "prestamo": prestamo.to_json()
+        }, 201
     
 if __name__ == '__main__':
     pass
