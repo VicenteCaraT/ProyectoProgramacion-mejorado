@@ -5,6 +5,7 @@ import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.c
 import { PrestamosService } from '../../services/loans/prestamos.service';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -18,7 +19,8 @@ export class PrestamoComponent implements OnInit{
     private dialog: MatDialog,
     private loanService: PrestamosService,
     private reviewService: ReseñasService,
-    private sysNotificationService: SysNotificationService
+    private sysNotificationService: SysNotificationService,
+    private route: ActivatedRoute
 
   ) {}
 
@@ -32,8 +34,9 @@ export class PrestamoComponent implements OnInit{
   ngOnInit(): void {
     const tokenRol = localStorage.getItem('token_rol');
     const tokenUserId = localStorage.getItem('user_id');
+    const routeUserId = this.route.snapshot.queryParamMap.get('idUsuario');
 
-    const params = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : {};
+    const params = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : routeUserId ? { idUsuario: routeUserId } : {};
     this.fetchLoans(1, params);
     }
 

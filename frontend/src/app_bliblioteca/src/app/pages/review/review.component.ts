@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-review',
@@ -11,7 +12,8 @@ export class ReviewComponent implements OnInit{
 
   constructor(
     private reviewService: ReseñasService,
-    private sysNotificationService: SysNotificationService
+    private sysNotificationService: SysNotificationService,
+    private route: ActivatedRoute
   ) {}
 
   reviewList: any[] = [];
@@ -22,8 +24,9 @@ export class ReviewComponent implements OnInit{
   ngOnInit(): void {
     const tokenRol = localStorage.getItem('token_rol');
     const tokenUserId = localStorage.getItem('user_id');
+    const routeUserId = this.route.snapshot.queryParamMap.get('idUsuario')
 
-    const params = tokenRol === 'Usuario' && tokenUserId ? { idUserPost: tokenUserId } : {};
+    const params = tokenRol === 'Usuario' && tokenUserId ? { idUserPost: tokenUserId } : routeUserId ? { idUserPost: routeUserId } : {};    
     this.fetchReviews(this.currentPage, params);
   }
 
