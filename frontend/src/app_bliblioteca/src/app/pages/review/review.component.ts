@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
+import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 
 @Component({
   selector: 'app-review',
@@ -9,7 +10,8 @@ import { ReseñasService } from '../../services/reviews/reseñas.service';
 export class ReviewComponent implements OnInit{
 
   constructor(
-    private reviewService: ReseñasService
+    private reviewService: ReseñasService,
+    private sysNotificationService: SysNotificationService
   ) {}
 
   reviewList: any[] = [];
@@ -39,5 +41,20 @@ export class ReviewComponent implements OnInit{
       this.currentPage = page;
       this.fetchReviews(this.currentPage);
     }
+  }
+
+  handleActionEvent(event: { action: string, review: any }) {
+    if (event.action === 'delete') {
+      this.reviewService.deleteReview(event.review.id).subscribe({
+        next: () => {
+          this.sysNotificationService.showSuccess('Usuario eliminado correctamente')
+          this.fetchReviews(this.currentPage)
+        },
+        error: (err) => {
+          console.error('Error al eliminar el usuario', err)
+          this.sysNotificationService.showError('Error al eliminar el usuario')
+        }
+      });
+    }   
   }
 }

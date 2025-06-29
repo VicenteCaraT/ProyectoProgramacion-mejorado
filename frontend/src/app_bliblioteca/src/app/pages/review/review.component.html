@@ -10,7 +10,8 @@
             [user]="null" 
             [review]="review" 
             [isReviewPage]="true" 
-            [showDropdown]="true">
+            [showDropdown]="true"
+            (actionEvent)="handleActionEvent($event)">
         </app-user-item>
     </section>
 

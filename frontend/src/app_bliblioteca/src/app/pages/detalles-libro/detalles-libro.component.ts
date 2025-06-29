@@ -6,6 +6,7 @@ import { ReseñasService } from '../../services/reviews/reseñas.service';
 import { RegisterModalComponent } from '../../components/modals/register-modal/register-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-detalles-libro',
@@ -23,6 +24,7 @@ export class DetallesLibroComponent implements OnInit{
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog,
+    private location: Location,
     private sysNotificationService: SysNotificationService
   ) {}
 
@@ -102,7 +104,7 @@ export class DetallesLibroComponent implements OnInit{
       }
     });
   }
-  goBack(): void {
-    this.router.navigate(['/search']);
+  goBack() {
+    this.location.back()
   }
 }

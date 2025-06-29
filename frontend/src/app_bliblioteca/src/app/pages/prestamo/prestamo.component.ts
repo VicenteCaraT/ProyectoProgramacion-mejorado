@@ -45,6 +45,7 @@ export class PrestamoComponent implements OnInit{
       });
     }
 
+  //areglar
   handleSearch(query: string) {
     if (query) {
       this.filteredLoans = this.loanList.filter(loan =>

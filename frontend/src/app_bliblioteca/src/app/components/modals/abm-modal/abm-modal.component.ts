@@ -60,7 +60,7 @@ export class AbmModalComponent {
           estado: [this.data.estado || '', Validators.required],
         })
         break;
-      
+        
         default:
           throw new Error('Tipo de formulario desconocido');
     }
