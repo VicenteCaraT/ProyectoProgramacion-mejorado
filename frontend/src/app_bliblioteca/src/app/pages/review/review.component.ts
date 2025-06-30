@@ -23,14 +23,20 @@ export class ReviewComponent implements OnInit{
   filteredReviews: any[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
+  currentParams: { idUserPost?: string, idLibro?: string } = {};
+
   
   ngOnInit(): void {
     const tokenRol = localStorage.getItem('token_rol');
     const tokenUserId = localStorage.getItem('user_id');
     const routeUserId = this.route.snapshot.queryParamMap.get('idUsuario')
 
-    const params = tokenRol === 'Usuario' && tokenUserId ? { idUserPost: tokenUserId } : routeUserId ? { idUserPost: routeUserId } : {};    
-    this.fetchReviews(this.currentPage, params);
+    this.currentParams = tokenRol === 'Usuario' && tokenUserId
+      ? { idUserPost: tokenUserId }
+      : routeUserId
+        ? { idUserPost: routeUserId }
+        : {};
+    this.fetchReviews(this.currentPage, this.currentParams);
   }
 
   fetchReviews(page: number, params?: { idUserPost?: string, idLibro?: string }): void {
@@ -45,19 +51,18 @@ export class ReviewComponent implements OnInit{
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.fetchReviews(this.currentPage);
+      this.fetchReviews(this.currentPage, this.currentParams);
     }
   }
 
   handleActionEvent(event: { action: string, review: any }) {
     if (event.action === 'edit') {
       this.openABMReviewModal(event.review, 'edit');
-      this.fetchReviews(this.currentPage);
     } else if (event.action === 'delete') {
       this.reviewService.deleteReview(event.review.id).subscribe({
         next: () => {
           this.sysNotificationService.showSuccess('Libro eliminado correctamente')
-          this.fetchReviews(this.currentPage);
+          this.fetchReviews(this.currentPage, this.currentParams);
         },
         error: (err) => {
           console.error('Error al eliminar el libro', err)
@@ -80,10 +85,16 @@ export class ReviewComponent implements OnInit{
         console.log('El modal se cerro', result);
 
         if (result && operation === 'edit') {
-          this.reviewService.updateReview(reviewData.id, result).subscribe({
+          const valoracionFinal = `${result.valoracionNum}/5`;
+          const payload = {
+            ...result,
+            valoracion: valoracionFinal
+          };
+          delete payload.valoracionNum;
+          this.reviewService.updateReview(reviewData.id, payload).subscribe({
             next: () => {
               this.sysNotificationService.showSuccess('Reseña editada correctamente')
-              this.fetchReviews(this.currentPage);
+              this.fetchReviews(this.currentPage, this.currentParams);
             },
             error: () => {
               this.sysNotificationService.showError('Error al editar la reseña')

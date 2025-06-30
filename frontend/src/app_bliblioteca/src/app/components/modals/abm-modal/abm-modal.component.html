@@ -176,9 +176,9 @@
             </mat-form-field>
 
             <mat-form-field class="full-width">
-                <mat-label>Valoracion</mat-label>
-                <input matInput formControlName="valoracion" placeholder="Ingrese la valoracion">
-                <mat-error *ngIf="formEntity.get('valoracion')?.invalid">Este campo es requerido.</mat-error>
+                <mat-label>Valoración</mat-label>
+                <input matInput type="number" formControlName="valoracionNum" min="1" max="5" placeholder="1 a 5">
+                <mat-error *ngIf="formEntity.get('valoracionNum')?.invalid">Debe ser un número del 1 al 5.</mat-error>
             </mat-form-field>
         </div>
     </mat-dialog-content>

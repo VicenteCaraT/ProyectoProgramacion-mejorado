@@ -63,12 +63,13 @@ export class AbmModalComponent {
       case 'review':
         if (this.formOperation === 'edit') {
           this.formTitle = 'Editar Reseña';
+          const valoracionNum = this.data.valoracion ? parseInt(this.data.valoracion.split('/')[0]) : '';
           // Define el formulario solo para editar reseña
           this.formEntity = this.formBuilder.group({
         usuario: [this.data.usuario?.id || '', Validators.required],
         libro: [this.data.libro?.id || '', Validators.required],
         descripcion: [this.data.descripcion || '', Validators.required],
-        valoracion: [this.data.valoracion || '', Validators.required]
+        valoracionNum: [valoracionNum, [Validators.required, Validators.min(1), Validators.max(5)]]
           });
         } else {
           throw new Error('Solo se permite editar reseñas');
