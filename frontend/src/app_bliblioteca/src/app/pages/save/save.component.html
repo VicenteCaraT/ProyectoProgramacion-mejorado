@@ -15,5 +15,5 @@
                 (click)="goToBook(book.id)">
             </app-book-item>
         </section>
-        
+        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)"></app-pagination>
     </div>

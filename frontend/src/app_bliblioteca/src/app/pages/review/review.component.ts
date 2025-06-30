@@ -23,7 +23,9 @@ export class ReviewComponent implements OnInit{
   filteredReviews: any[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
-  currentParams: { idUserPost?: string, idLibro?: string } = {};
+
+  currentFilter: { type: string, value: string } | null = null;
+  baseParams: any = {};
 
   
   ngOnInit(): void {
@@ -31,15 +33,12 @@ export class ReviewComponent implements OnInit{
     const tokenUserId = localStorage.getItem('user_id');
     const routeUserId = this.route.snapshot.queryParamMap.get('idUsuario')
 
-    this.currentParams = tokenRol === 'Usuario' && tokenUserId
-      ? { idUserPost: tokenUserId }
-      : routeUserId
-        ? { idUserPost: routeUserId }
-        : {};
-    this.fetchReviews(this.currentPage, this.currentParams);
+    this.baseParams = tokenRol === 'Usuario' && tokenUserId ? { idUserPost: tokenUserId }: routeUserId ? { idUserPost: routeUserId }: {};
+    this.fetchReviews(1, this.baseParams);
   }
 
-  fetchReviews(page: number, params?: { idUserPost?: string, idLibro?: string }): void {
+  fetchReviews(page: number, extraParams: any = {}): void {
+    const params = {...this.baseParams, ...extraParams}
     this.reviewService.getReviews(page, params).subscribe((rta: any) => {
       console.log('Reseñas API: ', rta);
       this.reviewList = rta.reseñas || [];
@@ -51,7 +50,8 @@ export class ReviewComponent implements OnInit{
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.fetchReviews(this.currentPage, this.currentParams);
+      const filterParams =this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value }: {};
+      this.fetchReviews(this.currentPage, filterParams);
     }
   }
 
@@ -62,7 +62,7 @@ export class ReviewComponent implements OnInit{
       this.reviewService.deleteReview(event.review.id).subscribe({
         next: () => {
           this.sysNotificationService.showSuccess('Libro eliminado correctamente')
-          this.fetchReviews(this.currentPage, this.currentParams);
+          this.fetchReviews(this.currentPage, this.currentFilter);
         },
         error: (err) => {
           console.error('Error al eliminar el libro', err)
@@ -94,7 +94,7 @@ export class ReviewComponent implements OnInit{
           this.reviewService.updateReview(reviewData.id, payload).subscribe({
             next: () => {
               this.sysNotificationService.showSuccess('Reseña editada correctamente')
-              this.fetchReviews(this.currentPage, this.currentParams);
+              this.fetchReviews(this.currentPage, this.currentFilter);
             },
             error: () => {
               this.sysNotificationService.showError('Error al editar la reseña')
