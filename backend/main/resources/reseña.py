@@ -19,13 +19,13 @@ class Reseña(Resource):
         return reseña.to_json()
     
     @handle_errors
-    @role_required(roles=["Usuario"])
+    @role_required(roles=["Usuario", "Admin"])
     # el usuario se puede modificar, solo a si mismo
     def put(self, id):
         reseña = db.session.query(ReseñaModel).get_or_404(id)
         data = request.get_json()
         current_user_id = get_jwt_identity()
-        if int(current_user_id) != reseña.fk_idUser:
+        if int(current_user_id) != int(reseña.fk_idUser) and "Admin" not in get_jwt().get('rol', []):
             return {'message' : 'No tienes permiso para modificar la reseña de este usuario'}
         nuevo_usuario_id = data.get('usuario')
         
@@ -48,7 +48,7 @@ class Reseña(Resource):
         db.session.commit()
         return {
             "message": f"Reseña con ID {id} actualizada correctamente.",
-            "prestamo": reseña.to_json()
+            "reseña": reseña.to_json()
         }, 200
         
     @handle_errors
