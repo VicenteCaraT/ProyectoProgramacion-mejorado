@@ -155,6 +155,32 @@
                 <mat-error *ngIf="formEntity.get('estado')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
         </div>
+    <!--Formulario para reseñas-->
+        <div *ngIf="data.formType === 'review'">
+            <mat-form-field class="full-width">
+                <mat-label>Usuario</mat-label>
+                <input matInput type="number" formControlName="usuario" placeholder="Ingrese el id del usuario">
+                <mat-error *ngIf="formEntity.get('usuario')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+            
+            <mat-form-field class="full-width">
+                <mat-label>Libro</mat-label>
+                <input matInput type="number" formControlName="libro" placeholder="Ingrese el id del libro">
+                <mat-error *ngIf="formEntity.get('libro')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+                <mat-label>Descripcion</mat-label>
+                <textarea matInput formControlName="descripcion" placeholder="Ingrese la descripcion"></textarea>
+                <mat-error *ngIf="formEntity.get('descripcion')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+                <mat-label>Valoracion</mat-label>
+                <input matInput formControlName="valoracion" placeholder="Ingrese la valoracion">
+                <mat-error *ngIf="formEntity.get('valoracion')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+        </div>
     </mat-dialog-content>
 
     <mat-dialog-actions class="mat-footer">

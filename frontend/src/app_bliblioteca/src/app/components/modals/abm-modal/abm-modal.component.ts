@@ -60,9 +60,23 @@ export class AbmModalComponent {
           estado: [this.data.estado || '', Validators.required],
         })
         break;
-        
-        default:
-          throw new Error('Tipo de formulario desconocido');
+      case 'review':
+        if (this.formOperation === 'edit') {
+          this.formTitle = 'Editar Reseña';
+          // Define el formulario solo para editar reseña
+          this.formEntity = this.formBuilder.group({
+        usuario: [this.data.usuario?.id || '', Validators.required],
+        libro: [this.data.libro?.id || '', Validators.required],
+        descripcion: [this.data.descripcion || '', Validators.required],
+        valoracion: [this.data.valoracion || '', Validators.required]
+          });
+        } else {
+          throw new Error('Solo se permite editar reseñas');
+        }
+        break;
+
+      default:
+        throw new Error('Tipo de formulario desconocido');
     }
   }
 

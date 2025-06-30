@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 
 @Component({
   selector: 'app-review',
@@ -13,7 +15,8 @@ export class ReviewComponent implements OnInit{
   constructor(
     private reviewService: ReseñasService,
     private sysNotificationService: SysNotificationService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog
   ) {}
 
   reviewList: any[] = [];
@@ -47,17 +50,46 @@ export class ReviewComponent implements OnInit{
   }
 
   handleActionEvent(event: { action: string, review: any }) {
-    if (event.action === 'delete') {
+    if (event.action === 'edit') {
+      this.openABMReviewModal(event.review, 'edit');
+      this.fetchReviews(this.currentPage);
+    } else if (event.action === 'delete') {
       this.reviewService.deleteReview(event.review.id).subscribe({
         next: () => {
-          this.sysNotificationService.showSuccess('Usuario eliminado correctamente')
-          this.fetchReviews(this.currentPage)
+          this.sysNotificationService.showSuccess('Libro eliminado correctamente')
+          this.fetchReviews(this.currentPage);
         },
         error: (err) => {
-          console.error('Error al eliminar el usuario', err)
-          this.sysNotificationService.showError('Error al eliminar el usuario')
+          console.error('Error al eliminar el libro', err)
+          this.sysNotificationService.showError('Error al eliminar el libro')
+        }
+      })
+    }
+  }
+
+  openABMReviewModal(reviewData: any, operation: string): void {
+      const dialogRef = this.dialog.open(AbmModalComponent, {
+        width: '500px',
+        data: {
+          formType: 'review',
+          formOperation: operation,
+          ...reviewData
+        } 
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('El modal se cerro', result);
+
+        if (result && operation === 'edit') {
+          this.reviewService.updateReview(reviewData.id, result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Reseña editada correctamente')
+              this.fetchReviews(this.currentPage);
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al editar la reseña')
+            }
+          });
         }
       });
-    }   
-  }
+    }
 }
