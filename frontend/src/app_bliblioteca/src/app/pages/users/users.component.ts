@@ -24,12 +24,14 @@ export class UsersComponent implements OnInit{
   totalPages: number = 1;
 
   currentFilter: { type: string, value: string } | null = null;
+  baseParams: any = {};
 
   ngOnInit(): void {
-    this.fetchUsers(1)
+    this.fetchUsers(1, this.baseParams)
   }
 
-  fetchUsers(page: number, params?: { rol?: string, estado?: string }): void {
+  fetchUsers(page: number, extraParams: any = {}): void {
+    const params = {...this.baseParams, ...extraParams}
     this.usuarioService.getUsers(page, params).subscribe((rta: any) => {
       this.usersList = rta.usuarios || [];
       this.filteredUsers = [...this.usersList];
@@ -112,31 +114,31 @@ export class UsersComponent implements OnInit{
   }
 
   refreshUserList(): void {
-    this.fetchUsers(this.currentPage, this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value } : {});
+    const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value }: {};
+    this.fetchUsers(this.currentPage, filterParams)
   }
 
   changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
-      this.fetchUsers(this.currentPage);
+      const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.type }: {};
+      this.fetchUsers(this.currentPage, filterParams);
     }
   }
 
   handleFilterChange(option: { type: string, value: string }): void {
-    let filters: any = {};
+    this.currentPage = 1;
 
-    // Ajustar el manejo de tipos de filtro
-    if (option.value === 'Usuario' || option.value === 'Admin' || option.value === 'Bibliotecario' || option.value === 'Pendiente') {
-        filters.rol = option.value;
-    } else if (option.value === '0' || option.value === '1') {
-        filters.estado = option.value;
+    if (option.value === '') {
+      this.currentFilter = null;
+      this.fetchUsers(this.currentPage);
+    } else {
+      this.currentFilter = { type: option.type, value: option.value };
+      const filterParams = { [option.type]: option.value };
+      this.fetchUsers(this.currentPage, filterParams);
     }
-    
-    // Actualiza el filtro actual
-    this.currentFilter = { type: option.type, value: option.value };
-    this.fetchUsers(this.currentPage, filters);
   }
-
+  
   acceptUser(user: any) {
     this.usuarioService.updateUser(user.id, { rol: 'Usuario' }).subscribe({
       next: () => {

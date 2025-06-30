@@ -30,17 +30,19 @@ export class PrestamoComponent implements OnInit{
   totalPages: number = 1;
 
   currentFilter: { type: string, value: string } | null = null;
+  baseParams: any = {};
 
   ngOnInit(): void {
     const tokenRol = localStorage.getItem('token_rol');
     const tokenUserId = localStorage.getItem('user_id');
     const routeUserId = this.route.snapshot.queryParamMap.get('idUsuario');
 
-    const params = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : routeUserId ? { idUsuario: routeUserId } : {};
-    this.fetchLoans(1, params);
+    this.baseParams = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : routeUserId ? { idUsuario: routeUserId } : {};
+    this.fetchLoans(1, this.baseParams);
     }
 
-    fetchLoans(page: number, params?: { estado?: string, idUsuario?: string }): void {
+    fetchLoans(page: number, extraParams: any = {}): void {
+      const params = {...this.baseParams, ...extraParams}
       this.loanService.getLoans(page, params).subscribe((rta: any) => {
         this.loanList = rta.prestamos || [];
         this.filteredLoans = [...this.loanList];
@@ -94,7 +96,6 @@ export class PrestamoComponent implements OnInit{
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log('El modal se cerró', result); 
-      // arreglar porque al apretar close se hace el post igual
       if (result) {
         if (operation === 'create') {
           this.loanService.postLoan(result).subscribe({
@@ -122,33 +123,29 @@ export class PrestamoComponent implements OnInit{
   }
 
   refreshLoanList(): void {
-    const tokenRol = localStorage.getItem('token_rol');
-    const tokenUserId = localStorage.getItem('user_id');
-    const params = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : {};
-
-    this.fetchLoans(this.currentPage, { ...params, ...(this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value } : {}) });
+    const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value } : {};
+    this.fetchLoans(this.currentPage, filterParams)
   }
 
   changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
-      this.fetchLoans(this.currentPage);
+      const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value } : {};
+      this.fetchLoans(this.currentPage, filterParams);
     }
   }
 
-  handleFilterChange(option: { type: string, value: string }): void {
-    let filters: any = {};
+    handleFilterChange(option: { type: string, value: string }): void {
+    this.currentPage = 1;
 
-    // Ajustar el manejo de tipos de filtro
-    if (option.value === 'Activo' || option.value === 'Desactivo' || option.value === 'Pendiente') {
-        filters.estado = option.value;
-    } else if (option.type === 'fecha_proxima') {
-        filters.fecha_proxima = option.value;
+    if (option.value === '') {
+      this.currentFilter = null;
+      this.fetchLoans(this.currentPage);
+    } else {
+      this.currentFilter = { type: option.type, value: option.value };
+      const filterParams = { [option.type]: option.value };
+      this.fetchLoans(this.currentPage, filterParams);
     }
-    
-    // Actualiza el filtro actual
-    this.currentFilter = { type: option.type, value: option.value };
-    this.fetchLoans(this.currentPage, filters);
   }
 
   openRealizarResena(loan: any): void {
@@ -169,7 +166,6 @@ export class PrestamoComponent implements OnInit{
     });
 }
 
-  // Arreglar put
   acceptLoan(loan: any) {
     this.loanService.updateLoan(loan.id, { estado: 'Activo' }).subscribe({
       next: () => {
