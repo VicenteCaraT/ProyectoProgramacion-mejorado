@@ -14,17 +14,32 @@ export class TopComponent implements OnInit{
     private router: Router
   ) {}
 
-  bookList:any[] = []
-  filteredBook:any = []
+  bookList: any[] = [];
+  filteredBook: any[] = [];
+  currentPage: number = 1;
+  totalPages: number = 1;
 
   ngOnInit(): void {
-    this.bookService.getBooks(1, { orden: 'ranking'}).subscribe((rta: any) => {
-      console.log("Libros Api: ", rta);
-      this.bookList = rta.libros || [];
-      this.filteredBook = [...this.bookList]
-    })
+    this.fetchTopBooks(1);
   }
-    goToBook(bookID: string) {
-    this.router.navigate(['/libro', bookID])
+
+  fetchTopBooks(page: number): void {
+    this.bookService.getBooks(page, { orden: 'ranking' }).subscribe((rta: any) => {
+      console.log("Libros API:", rta);
+      this.bookList = rta.libros || [];
+      this.filteredBook = [...this.bookList];
+      this.totalPages = rta.pages;
+    });
+  }
+
+  changePage(newPage: number): void {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.currentPage = newPage;
+      this.fetchTopBooks(this.currentPage);
+    }
+  }
+
+  goToBook(bookID: string): void {
+    this.router.navigate(['/libro', bookID]);
   }
 }

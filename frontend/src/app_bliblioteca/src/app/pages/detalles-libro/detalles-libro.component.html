@@ -30,7 +30,6 @@
                 <app-save-icon [libroID]="book.id"></app-save-icon>
             </div>
         </div>
-        <!--Agregar paginación a las reseñas-->
         <div class="reseñas mt-4">
             <h3>Reseñas del Libro</h3>
             <div *ngFor="let review of reviews" class="reseña p-2 mb-2 rounded d-flex align-items-start">
@@ -42,6 +41,7 @@
                     <p><small>Valoración: {{ review.valoracion }}</small></p>
                 </div>
             </div>
+            <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)"></app-pagination>
         </div>
     </div>
 </div>

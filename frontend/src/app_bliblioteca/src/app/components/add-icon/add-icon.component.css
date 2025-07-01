@@ -14,9 +14,19 @@
     font-size: 24px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    z-index: 9999;
 }
 
 .add-icon:hover {
     background-color: #e5e05e;
 }
 
+@media (max-width: 600px) {
+.add-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    bottom: 15px;
+    right: 15px;
+}
+}
