@@ -12,7 +12,7 @@ export class PrestamosService {
     private httpClient: HttpClient,
   ) { }
 
-  getLoans(page: number, params?: {idUsuario?:string, nombre_usuario?:string, inicio_prestamo?:string, fin_prestamo?:string, cant_libros?:string, libro_id?:string, cant_prestamos?:string, estado?:string, orden?:string}) {
+  getLoans(page: number, params?: {idUsuario?:string, nombre_usuario?:string, inicio_prestamo?:string, fin_prestamo?:string, cant_libros?:string, libro_id?:string, cant_prestamos?:string, estado?:string, orden?:string, titulo_libro?:string}) {
     let auth_token = localStorage.getItem('token')
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -53,6 +53,12 @@ export class PrestamosService {
     if (params) {
       if (params.libro_id) {
         httpParams = httpParams.set('libro_id', params.libro_id)
+      }
+    }
+
+    if (params) {
+      if (params.titulo_libro) {
+        httpParams = httpParams.set('titulo', params.titulo_libro)
       }
     }
 

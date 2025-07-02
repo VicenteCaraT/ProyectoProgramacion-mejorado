@@ -51,20 +51,47 @@ export class PrestamoComponent implements OnInit{
     }
 
   //areglar
-  handleSearch(query: string) {
+
+  handleSearch(query:string) {
     if (query) {
       const lowerQuery = query.toLowerCase();
-      this.filteredLoans = this.loanList.filter(loan =>
-        loan.usuario?.user?.toLowerCase().includes(lowerQuery) ||
-        loan.libro?.some((libro: any) =>
-          libro.titulo.toLowerCase().includes(lowerQuery)
-        ) ||
-        loan.inicio_prestamo?.toLowerCase().includes(lowerQuery) ||
-        loan.fin_prestamo?.toLowerCase().includes(lowerQuery) ||
-        loan.estado?.toLowerCase().includes(lowerQuery)
-      );
+
+      const paramsList = [
+        { titulo_libro: query },
+        { nombre_usuario: query }
+      ];
+
+      const allResults: any[] = [];
+      const seenIds = new Set<number>();
+      let pending = paramsList.length;
+
+      for ( const params of paramsList) {
+        this.loanService.getLoans(1, params).subscribe(
+          (response: any) => {
+            if (response && response.prestamos) {
+              for (const prestamo of response.prestamos) {
+                if(!seenIds.has(prestamo.id)) {
+                  seenIds.add(prestamo.id);
+                  allResults.push(prestamo)
+                }
+              }
+            }
+            pending--;
+            if(pending === 0) {
+              this.filteredLoans = allResults;
+            }
+          },
+          (error) => {
+            console.error('Error de búsqueda', error);
+            pending--;
+            if (pending === 0) {
+              this.filteredLoans = allResults;
+            }
+          }
+        );
+      }
     } else {
-      this.filteredLoans = [...this.loanList];
+      this.filteredLoans = [...this.loanList]
     }
   }
 
