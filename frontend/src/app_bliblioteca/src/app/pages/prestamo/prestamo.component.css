@@ -3,3 +3,31 @@
     flex-direction: column;
     gap: 20px;
 }
+
+.actualizar-terminados {
+    background-color: #F5F378;
+    color: #333;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: auto;
+}
+
+.actualizar-terminados:hover {
+    background-color: #e5e05e;
+}
+
+@media (max-width: 600px) {
+.actualizar-terminados {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+}
+}
