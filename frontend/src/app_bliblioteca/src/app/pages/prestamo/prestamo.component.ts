@@ -178,4 +178,24 @@ export class PrestamoComponent implements OnInit{
       }
     });
   }
+
+  actualizarPrestamosVencidos(): void {
+  this.loanService.patchLoans().subscribe({
+    next: (res: any) => {
+      this.sysNotificationService.showSuccess(res.message);
+      this.refreshLoanList()
+    },
+    error: () => {
+      this.sysNotificationService.showError("Error al actualizar préstamos");
+    }
+  });
+}
+  isAdmin() { 
+    const tokenRol = localStorage.getItem('token_rol');
+  if (tokenRol && tokenRol.includes("Admin")) {
+    return true;
+  } else {
+    return false;
+  }
+}
 }

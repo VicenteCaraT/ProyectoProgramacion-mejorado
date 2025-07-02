@@ -7,6 +7,9 @@
         <app-searchbar [currentPage]="'prestamo'" (searchEvent)="handleSearch($event)" (filterChange)="handleFilterChange($event)"></app-searchbar>
 
         <h2>Préstamos</h2>
+        <button (click)="actualizarPrestamosVencidos()" *ngIf="isAdmin()" title="Actualizar préstamos vencidos">
+        <i class="fas fa-sync-alt"></i>
+        </button>
         <section class="loans mb-3" *ngFor="let loan of filteredLoans" >
             <app-loan-item [loan]="loan" (actionEvent)="handleActionEvent($event)" (resena)="openRealizarResena($event)"></app-loan-item>
         </section>

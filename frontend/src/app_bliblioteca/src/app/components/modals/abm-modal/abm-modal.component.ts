@@ -98,24 +98,24 @@ export class AbmModalComponent {
     this.dialogRef.close(formData);
   }
 
-saveChanges(): void {
-  if (this.formEntity.valid) {
-    const formData = { ...this.formEntity.value };
-
-    // Si el formulario es de préstamo, parsea las fechas
-    if (formData.inicio_prestamo && formData.fin_prestamo) {
-      formData.inicio_prestamo = this.formatDate(formData.inicio_prestamo);
-      formData.fin_prestamo = this.formatDate(formData.fin_prestamo);
-    }
-    this.handleSave(formData);
-  }
-}
-
-  formatDate(date: string | Date): string {
-    const parsedDate = new Date(date);
-    const day = (parsedDate.getDate() + 1).toString().padStart(2, '0'); 
-    const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0'); 
-    const year = parsedDate.getFullYear();
+  formatDate(dateStr: string): string {
+    const [year, month, day] = dateStr.split('-');
     return `${day}-${month}-${year}`;
+  }
+
+  saveChanges(): void {
+    if (this.formEntity.valid) {
+      const formData = { ...this.formEntity.value };
+
+      if (this.data.formType === 'loan') {
+        formData.inicio_prestamo = this.formatDate(formData.inicio_prestamo);
+        formData.fin_prestamo = this.formatDate(formData.fin_prestamo);
+
+        formData.libro = [formData.libro];
+      }
+
+      console.log('Formulario enviado:', formData);
+      this.handleSave(formData);
+    }
   }
 }

@@ -107,4 +107,15 @@ export class PrestamosService {
     })
     return this.httpClient.delete(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
   }
+
+  patchLoans() {
+  let auth_token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${auth_token}`
+  });
+  return this.httpClient
+    .patch(`${this.url}/prestamos`, {}, { headers: headers })
+    .pipe(first());
+}
 }

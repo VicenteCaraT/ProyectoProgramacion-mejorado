@@ -61,12 +61,12 @@ export class DetallesLibroComponent implements OnInit{
   solicitarPrestamo(): void {
     const tokenUserId = localStorage.getItem('user_id');
     const tokenJWT = localStorage.getItem('token');
-  
+
     if (!tokenUserId || !tokenJWT) {
       const dialogRef = this.dialog.open(RegisterModalComponent, {
         width: '400px',
       });
-  
+
       dialogRef.afterClosed().subscribe(result => {
         if (result === 'signup') {
           this.router.navigate(['/signup']);
@@ -74,35 +74,19 @@ export class DetallesLibroComponent implements OnInit{
       });
       return;
     }
-  
-    const fechaActual = new Date();
-    const dia = String(fechaActual.getDate()).padStart(2, '0');
-    const mes = String(fechaActual.getMonth() + 1).padStart(2, '0');
-    const anio = fechaActual.getFullYear();
-    const inicioPrestamo = `${dia}-${mes}-${anio}`;
-  
-    // Calcular la fecha de fin de préstamo (1 mes después)
-    const fechaFin = new Date(fechaActual);
-    fechaFin.setMonth(fechaFin.getMonth() + 1);
-    const diaFin = String(fechaFin.getDate()).padStart(2, '0');
-    const mesFin = String(fechaFin.getMonth() + 1).padStart(2, '0');
-    const anioFin = fechaFin.getFullYear();
-    const finPrestamo = `${diaFin}-${mesFin}-${anioFin}`;
-  
+
     const prestamoData = {
       usuario: tokenUserId,
-      libro: [this.book.id], 
-      inicio_prestamo: inicioPrestamo,
-      fin_prestamo: finPrestamo,
-      estado: 'Pendiente' 
+      libro: [this.book.id]
     };
-  
+
     this.loanService.postLoan(prestamoData).subscribe({
-      next: () => {
-        this.sysNotificationService.showSuccess('Préstamo solicitado con éxito')
+      next: (response) => {
+        this.sysNotificationService.showSuccess('Préstamo solicitado con éxito');
       },
-      error: () => {
-        this.sysNotificationService.showError('Error al solicitar el préstamo')
+      error: (error) => {
+        const msg = error?.error?.message || 'Error al solicitar el préstamo';
+        this.sysNotificationService.showError(msg);
       }
     });
   }
