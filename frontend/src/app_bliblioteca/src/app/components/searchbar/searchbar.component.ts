@@ -56,7 +56,8 @@ export class SearchbarComponent implements OnChanges{
           clearFilterOption,
           { type: 'estado', value: 'Pendiente', label: 'Pendiente' },
           { type: 'estado', value: 'Activo', label: 'Activos' },
-          { type: 'fecha_proxima', value: '1', label: 'Fechas Próximas' }
+          { type: 'estado', value: 'Terminado', label: 'Terminados' },
+          { type: 'orden', value: 'proximos', label: 'Próximos a Terminar' }
         ];
         break;
         case 'usuarios':
