@@ -91,9 +91,17 @@ class Prestamo(Resource):
     @role_required(roles=["Admin"])
     def delete(self, id):
         prestamo = db.session.query(PrestamoModel).get_or_404(id)
+
+        # Devolver cada libro del préstamo al stock
+        for libro in prestamo.fk_idLibro:
+            libro.cantidad += 1
+
         db.session.delete(prestamo)
         db.session.commit()
-        return '', 204
+
+        return {
+            "message": "Préstamo eliminado y libros devueltos al stock."
+        }, 200
     
 class Prestamos(Resource):
     
@@ -119,10 +127,16 @@ class Prestamos(Resource):
         libro = request.args.get('libro_id')
         cant_prestamo = request.args.get("cant_prestamos")
         estado = request.args.get('estado')
+        nombre_usuario = request.args.get('nombre_usuario')
 
         #usuario
         if usuario:
             prestamos = prestamos.filter(PrestamoModel.fk_idUser == usuario)
+            
+        if nombre_usuario:
+            prestamos = prestamos.join(PrestamoModel.fk_idUser).filter(
+            func.lower(UsuarioModel.user).like(f"%{nombre_usuario.lower()}%")
+        )   
 
         #inicio_prestamo
         if fecha_inicio:

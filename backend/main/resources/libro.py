@@ -63,17 +63,25 @@ class Libros(Resource):
         titulo = request.args.get("titulo")
         editorial = request.args.get("editorial")
         orden = request.args.get("orden")
+        sin_stock = request.args.get("sin_stock")
+        
         # Filtros de búsqueda
         if genero:
             libros_query = libros_query.filter(LibroModel.genero.like(f"%{genero}%"))
         if autor:
-            autor_id = AutorModel.query.get_or_404(autor)
-            libros_query = libros_query.filter(LibroModel.fk_idAutor.contains(autor_id))
+            libros_query = libros_query.join(LibroModel.fk_idAutor).filter(
+                func.lower(AutorModel.nombre).like(f"%{autor.lower()}%") |
+                func.lower(AutorModel.apellido).like(f"%{autor.lower()}%")
+            )
         if titulo:
             libros_query = libros_query.filter(LibroModel.titulo.like(f"%{titulo}%"))
         if editorial:
             libros_query = libros_query.filter(LibroModel.editorial.like(f"%{editorial}%"))
-            
+        if sin_stock == "true":
+            libros_query = libros_query.filter(LibroModel.cantidad == 0)
+        if orden == "mayor_stock":
+            libros_query = libros_query.order_by(LibroModel.cantidad.desc())
+
         # Ordenar por ranking dinámico (promedio_valoracion)
         libros = libros_query.all()
         if orden == "ranking":
