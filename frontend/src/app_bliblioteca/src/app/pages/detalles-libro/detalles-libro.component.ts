@@ -37,7 +37,7 @@ export class DetallesLibroComponent implements OnInit{
       this.bookService.getBooksById(Number(bookId)).subscribe(
         (data) => {
           this.book = data;
-          this.getBookReviews(this.currentPage);
+          this.getBookReviews(Number(bookId));
         },
         (error) => {
           console.log('Error al obtener los detalles del libro: ', error);
@@ -46,25 +46,17 @@ export class DetallesLibroComponent implements OnInit{
     }
   }
 
-  getBookReviews(page: number): void {
+  getBookReviews(id: number): void {
     const params = { idLibro: this.book.id };
-    this.reviewService.getReviews(page, params).subscribe(
+    this.reviewService.getReviews(1, params).subscribe(
       (reviewsResponse) => {
         this.reviews = (reviewsResponse as any).reseñas;
-        this.totalPages = (reviewsResponse as any).pages;
       },
       (error) => {
         console.error('Error al obtener las reseñas del libro: ', error);
       }
     );
   }
-
-  changePage(newPage: number): void {
-  if (newPage >= 1 && newPage <= this.totalPages) {
-    this.currentPage = newPage;
-    this.getBookReviews(this.currentPage);
-  }
-}
 
   solicitarPrestamo(): void {
     const tokenUserId = localStorage.getItem('user_id');
@@ -117,4 +109,12 @@ export class DetallesLibroComponent implements OnInit{
   goBack() {
     this.location.back()
   }
+
+  changePage(newPage: number): void {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.currentPage = newPage;
+      this.getBookReviews(this.currentPage);
+    }
+  }
+
 }
