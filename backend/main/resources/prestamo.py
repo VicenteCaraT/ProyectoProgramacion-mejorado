@@ -125,6 +125,7 @@ class Prestamos(Resource):
         fecha_termino = request.args.get('fin_prestamo')
         cant_libros = request.args.get('cant_libros')
         libro = request.args.get('libro_id')
+        titulo_libro = request.args.get('titulo')
         cant_prestamo = request.args.get("cant_prestamos")
         estado = request.args.get('estado')
         nombre_usuario = request.args.get('nombre_usuario')
@@ -134,9 +135,9 @@ class Prestamos(Resource):
             prestamos = prestamos.filter(PrestamoModel.fk_idUser == usuario)
             
         if nombre_usuario:
-            prestamos = prestamos.join(PrestamoModel.fk_idUser).filter(
-            func.lower(UsuarioModel.user).like(f"%{nombre_usuario.lower()}%")
-        )   
+            prestamos = prestamos.join(UsuarioModel, PrestamoModel.fk_idUser == UsuarioModel.idUser).filter(
+                func.lower(UsuarioModel.user).like(f"%{nombre_usuario.lower()}%")
+            )
 
         #inicio_prestamo
         if fecha_inicio:
@@ -156,6 +157,11 @@ class Prestamos(Resource):
         if libro:
             libro_id = LibroModel.query.get_or_404(libro)
             prestamos = prestamos.filter(PrestamoModel.fk_idLibro.contains(libro_id))
+        
+        if titulo_libro:
+            prestamos = prestamos.join(PrestamoModel.fk_idLibro).filter(
+            func.lower(LibroModel.titulo).like(f"%{titulo_libro.lower()}%")
+        )
         
         #Ordenar de manera desc los usuarios con mas prestamos a los menos (Fixing)
         if cant_prestamo == "Desc_Prestamos":
