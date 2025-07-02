@@ -28,37 +28,63 @@ class Prestamo(Resource):
     @handle_errors
     @role_required(roles=["Admin"])
     def put(self, id):
+        
         prestamo = db.session.query(PrestamoModel).get_or_404(id)
+
         data = request.get_json()
 
-        nuevos_libros_ids = data.get('libro')
-        if nuevos_libros_ids:
-            if not isinstance(nuevos_libros_ids, list):
-                nuevos_libros_ids = [nuevos_libros_ids]
-            
-            nuevos_libros = [LibroModel.query.get_or_404(libro_id) for libro_id in nuevos_libros_ids]
+        # Fechas
+        if "inicio_prestamo" in data:
+            try:
+                prestamo.inicio_prestamo = datetime.strptime(data["inicio_prestamo"], "%d-%m-%Y")
+            except ValueError:
+                return {"message": "Formato de fecha inválido en 'inicio_prestamo', se espera dd-mm-aaaa"}, 400
+
+        if "fin_prestamo" in data:
+            try:
+                prestamo.fin_prestamo = datetime.strptime(data["fin_prestamo"], "%d-%m-%Y")
+            except ValueError:
+                return {"message": "Formato de fecha inválido en 'fin_prestamo', se espera dd-mm-aaaa"}, 400
+
+        # Estado
+        estado_anterior = prestamo.estado
+        nuevo_estado = data.get("estado")
+
+        if nuevo_estado:
+            prestamo.estado = nuevo_estado
+
+            if nuevo_estado == "Activo" and estado_anterior != "Activo":
+                for libro in prestamo.fk_idLibro:
+                    if libro.cantidad > 0:
+                        libro.cantidad -= 1
+                    else:
+                        return {"message": f"No hay cantidad disponible para el libro ID {libro.idLibro}"}, 400
+
+            elif nuevo_estado == "Desactivado" and estado_anterior == "Activo":
+                for libro in prestamo.fk_idLibro:
+                    libro.cantidad += 1
+
+        # Cambiar libro
+        if "libro" in data:
+            ids_libros = data["libro"]            
+            if isinstance(ids_libros, int):
+                ids_libros = [ids_libros]
+        
+            if not isinstance(ids_libros, list):
+                return {"message": "El campo 'libro' debe ser una lista de IDs"}, 400
+
+            nuevos_libros = db.session.query(LibroModel).filter(LibroModel.idLibro.in_(ids_libros)).all()
+
+            if len(nuevos_libros) != len(ids_libros):
+                return {"message": "Uno o más libros no existen"}, 400
+
             prestamo.fk_idLibro = nuevos_libros
-
-        nuevo_user_id = data.get("usuario")
-        if nuevo_user_id:
-            nuevo_user = UsuarioModel.query.get_or_404(nuevo_user_id)
-            prestamo.fk_user_prestamo = nuevo_user
-
-        regex = re.compile(r"(0?[1-9]|[12][0-9]|3[01])(-)(0?[1-9]|1[012])\2(\d{4})")
-
-        for key, value in data.items():
-            if key == 'libro' or key == 'usuario':
-                continue
-            elif regex.match(str(value)):
-                setattr(prestamo, key.lower(), datetime.strptime(value, "%d-%m-%Y"))
-            else:
-                setattr(prestamo, key.lower(), value)
-
-        db.session.add(prestamo)
         db.session.commit()
+
+        resultado = prestamo.to_json()
         return {
-            "message": f"Préstamo con ID {id} actualizado correctamente.",
-            "prestamo": prestamo.to_json()
+            "message": "Préstamo actualizado correctamente.",
+            "prestamo": resultado
         }, 200
     
     @handle_errors
@@ -75,7 +101,6 @@ class Prestamos(Resource):
     @role_required(roles=["Admin", "Usuario"])
     def get(self):
         page = 1
-
         per_page = 10
 
         prestamos = db.session.query(PrestamoModel)
@@ -94,7 +119,6 @@ class Prestamos(Resource):
         libro = request.args.get('libro_id')
         cant_prestamo = request.args.get("cant_prestamos")
         estado = request.args.get('estado')
-        fecha_proxima = request.args.get('proximas_fechas')
 
         #usuario
         if usuario:
@@ -112,68 +136,101 @@ class Prestamos(Resource):
         
         #prestamos por cantidad de libros
         if cant_libros:
-            prestamos=prestamos.outerjoin(PrestamoModel.fk_idLibro).group_by(PrestamoModel.idPrestamo).having(func.count(LibroModel.idLibro) == int(request.args.get("cant_libros")))
+            prestamos = prestamos.outerjoin(PrestamoModel.fk_idLibro).group_by(PrestamoModel.idPrestamo).having(func.count(LibroModel.idLibro) == int(cant_libros))
 
         #Prestamo por libro especifico
         if libro:
             libro_id = LibroModel.query.get_or_404(libro)
-            prestamos=prestamos.filter(PrestamoModel.fk_idLibro.contains(libro_id))
+            prestamos = prestamos.filter(PrestamoModel.fk_idLibro.contains(libro_id))
         
         #Ordenar de manera desc los usuarios con mas prestamos a los menos (Fixing)
         if cant_prestamo == "Desc_Prestamos":
-            prestamos==prestamos.outerjoin(PrestamoModel.fk_user_prestamo).group_by(UsuarioModel.idUser).order_by(func.count().desc()).all()
+            prestamos = prestamos.outerjoin(PrestamoModel.fk_user_prestamo).group_by(UsuarioModel.idUser).order_by(func.count().desc())
             
         # Filtro por estado
         if estado:
-            prestamos = prestamos.filter(PrestamoModel.estado.like("%"+estado+"%"))
+            prestamos = prestamos.filter(PrestamoModel.estado.like(f"%{estado}%"))
             
-        # Filtro por fechas próximas a terminar
-        if fecha_proxima:  #ARREGLAR
-            today = datetime.today()
-            end_date = today + timedelta(days=int(fecha_proxima))
-            
-            # Filtrar los préstamos en el rango de fechas
-            prestamos = prestamos.filter(PrestamoModel.fin_prestamo.between(today, end_date))
-            
-            # Ordenar los préstamos por fecha de terminación, de más próxima a más lejana
+        # Ordenar por fecha de finalización más próxima
+        if request.args.get('orden') == 'proximos':
+            prestamos = prestamos.filter(PrestamoModel.estado == "Activo")
             prestamos = prestamos.order_by(PrestamoModel.fin_prestamo.asc())
-        
 
         ### FIN FILTROS ###
         
         prestamos = prestamos.paginate(page=page, per_page=per_page, error_out=True)
 
-        return jsonify({'prestamos' : [prestamo.to_json() for prestamo in prestamos],
-                    'total' : prestamos.total,
-                    'pages' : prestamos.pages,
-                    'page' : page
+        return jsonify({
+            'prestamos': [prestamo.to_json() for prestamo in prestamos],
+            'total': prestamos.total,
+            'pages': prestamos.pages,
+            'page': page
         })
-
     @handle_errors
-    @role_required(roles=["Admin", "Usuario"]) #Cambiado para que el usuario pueda solicitar un prestamo
+    @role_required(roles=["Admin", "Usuario"])
     def post(self):
-        libro_exist = request.get_json().get("libro")
-        prestamo = PrestamoModel.from_json(request.get_json())
+        data = request.get_json()
+        user_id = data.get("usuario")
+        libro_ids = data.get("libro")
 
-        # Asegúrate de que libro_exist sea una lista
-        if not isinstance(libro_exist, list):
-            libro_exist = [libro_exist]
+        if not isinstance(libro_ids, list):
+            libro_ids = [libro_ids]
 
-        # Verifica que los libros existan
-        libros = LibroModel.query.filter(LibroModel.idLibro.in_(libro_exist)).all()
+        libros = LibroModel.query.filter(LibroModel.idLibro.in_(libro_ids)).all()
         if not libros:
             return {'message': 'Libro no encontrado'}, 404
 
-        # Agrega los libros al préstamo
+        for libro in libros:
+            if libro.cantidad <= 0:
+                return {'message': f'Sin stock para el libro ID {libro.idLibro}'}, 400
+
+            prestamo_existente = PrestamoModel.query \
+                .filter(PrestamoModel.fk_idUser == user_id) \
+                .filter(PrestamoModel.fk_idLibro.contains(libro)) \
+                .filter(PrestamoModel.estado == "Activo") \
+                .first()
+            if prestamo_existente:
+                return {'message': f'Ya existe un préstamo activo del libro ID {libro.idLibro} para el usuario'}, 400
+
+        # formato "dd-mm-aaaa"
+        if "inicio_prestamo" not in data or "fin_prestamo" not in data:
+            hoy = datetime.today()
+            data["inicio_prestamo"] = hoy.strftime("%d-%m-%Y")
+            data["fin_prestamo"] = (hoy + timedelta(days=30)).strftime("%d-%m-%Y")
+
+        prestamo = PrestamoModel.from_json(data)
+        prestamo.estado = "Pendiente"
+
         for libro in libros:
             prestamo.fk_idLibro.append(libro)
 
         db.session.add(prestamo)
         db.session.commit()
+
         return {
             "message": "Préstamo creado exitosamente.",
             "prestamo": prestamo.to_json()
         }, 201
-    
+        
+    @handle_errors
+    @role_required(roles=["Admin"])
+    def patch(self):
+        hoy = datetime.today()
+
+        prestamos = PrestamoModel.query.filter(PrestamoModel.estado == "Activo").all()
+        cambios = 0
+
+        for prestamo in prestamos:
+            if prestamo.fin_prestamo < hoy:
+                prestamo.estado = "Terminado"
+                for libro in prestamo.fk_idLibro:
+                    libro.cantidad += 1
+                cambios += 1
+
+        db.session.commit()
+        return {
+            "message": f"{cambios} préstamos vencidos fueron marcados como 'Terminado'."
+        }, 200
+        
 if __name__ == '__main__':
     pass
