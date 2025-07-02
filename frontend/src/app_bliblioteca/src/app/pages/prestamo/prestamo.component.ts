@@ -53,11 +53,15 @@ export class PrestamoComponent implements OnInit{
   //areglar
   handleSearch(query: string) {
     if (query) {
+      const lowerQuery = query.toLowerCase();
       this.filteredLoans = this.loanList.filter(loan =>
-        loan.titulo.toLowerCase().includes(query.toLowerCase()) ||
-        loan.usuario.user.toLowerCase().includes(query.toLowerCase())      ||
-        loan.inicio_fecha.toLowerCase().includes(query.toLowerCase())  ||
-        loan.fin_fecha.toLowerCase().includes(query.toLowerCase())
+        loan.usuario?.user?.toLowerCase().includes(lowerQuery) ||
+        loan.libro?.some((libro: any) =>
+          libro.titulo.toLowerCase().includes(lowerQuery)
+        ) ||
+        loan.inicio_prestamo?.toLowerCase().includes(lowerQuery) ||
+        loan.fin_prestamo?.toLowerCase().includes(lowerQuery) ||
+        loan.estado?.toLowerCase().includes(lowerQuery)
       );
     } else {
       this.filteredLoans = [...this.loanList];
