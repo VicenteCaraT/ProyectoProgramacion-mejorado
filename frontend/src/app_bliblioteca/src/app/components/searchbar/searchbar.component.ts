@@ -46,9 +46,9 @@ export class SearchbarComponent implements OnChanges{
       case 'catalogo':
         this.filterOptions = [
           clearFilterOption,
-          {value: 'user', label: 'Usuarios'},
-          {value: 'book', label: 'Libros'},
-          {value: 'status', label: 'Estado'}
+          { type: 'orden', value: 'mayor_stock', label: 'Mayor stock' },
+          { type: 'sin_stock', value: 'true', label: 'Sin stock' },
+          { type: 'orden', value: 'ranking', label: 'Ranking' },
         ];
         break;
       case 'prestamo':

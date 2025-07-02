@@ -12,7 +12,7 @@ export class LibrosService {
     private httpClient: HttpClient
   ) { }
 
-  getBooks(page: number, params?: {genero?:string, autor?:string, titulo?:string, editorial?:string, orden?:string}) {
+  getBooks(page: number, params?: {genero?:string, autor?:string, titulo?:string, editorial?:string, orden?:string, sin_stock?:string}) {
     let auth_token = localStorage.getItem('token')
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -49,6 +49,11 @@ export class LibrosService {
     if (params) {
       if (params.orden) {
         httpParams = httpParams.set('orden', params.orden)
+      }
+    }
+    if (params) {
+      if (params.sin_stock) {
+        httpParams = httpParams.set('sin_stock', params.sin_stock)
       }
     }
 

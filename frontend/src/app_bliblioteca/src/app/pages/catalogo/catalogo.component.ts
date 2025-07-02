@@ -22,32 +22,66 @@ export class CatalogoComponent implements OnInit{
   currentPage: number = 1;
   totalPages: number = 1;
 
+  currentFilter: { type: string, value: string } | null = null;
+  baseParam: any = {};
+
   ngOnInit(): void {
-    this.fetchBooks(this.currentPage);
+    this.fetchBooks(1, this.baseParam);
   }
 
-  fetchBooks(page: number): void {
-    this.bookService.getBooks(page).subscribe((rta: any) => {
+  fetchBooks(page: number, extraParams: any = {}): void {
+    const params = {...this.baseParam, ...extraParams}
+    this.bookService.getBooks(page, params).subscribe((rta: any) => {
       this.bookList = rta.libros || [];
-      this.filteredBook = [...this.filteredBook];
+      this.filteredBook = [...this.bookList];
       this.totalPages = rta.pages;
     })
   }
 
   // ARREGLAR ya que no filtra
   handleSearch(query: string) {
-    if(query) {
-      this.bookService.getBooks(1, { titulo: query }).subscribe(
-        (response: any) => {
-          if (response && response.libros) {
-            this.filteredBook = response.libros;
-          } else {
-            this.filteredBook = [...this.bookList]
+    if (query) {
+      const paramsList = [
+        { titulo: query },
+        { autor: query },
+        { genero: query },
+        { editorial: query }
+      ];
+
+      const allResults: any[] = [];
+      const seenIds = new Set<number>();
+      let pending = paramsList.length;
+
+      for (const params of paramsList) {
+        this.bookService.getBooks(1, params).subscribe(
+          (response: any) => {
+            if (response && response.libros) {
+              for (const libro of response.libros) {
+                if (!seenIds.has(libro.id)) {
+                  seenIds.add(libro.id);
+                  allResults.push(libro);
+                }
+              }
+            }
+            pending--;
+            if (pending === 0) {
+              this.filteredBook = allResults;
+            }
+          },
+          (error) => {
+            console.error('Error en búsqueda:', error);
+            pending--;
+            if (pending === 0) {
+              this.filteredBook = allResults;
+            }
           }
-        }
-      )
+        );
+      }
+    } else {
+      this.filteredBook = [...this.bookList];
     }
   }
+
   
   handleActionEvent(event: { action: string, book: any }) {
     if (event.action === 'edit') {
@@ -105,13 +139,28 @@ export class CatalogoComponent implements OnInit{
   }
   
   refreshBookList(): void {
-    this.fetchBooks(this.currentPage);
+    const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.type }: {};
+    this.fetchBooks(this.currentPage, filterParams);
   }
 
   changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
+      const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.type }: {};
+      this.fetchBooks(this.currentPage, filterParams);
+    }
+  }
+
+    handleFilterChange(option: { type: string, value: string }): void {
+    this.currentPage = 1;
+
+    if (option.value === '') {
+      this.currentFilter = null;
       this.fetchBooks(this.currentPage);
+    } else {
+      this.currentFilter = { type: option.type, value: option.value };
+      const filterParams = { [option.type]: option.value };
+      this.fetchBooks(this.currentPage, filterParams);
     }
   }
 }
