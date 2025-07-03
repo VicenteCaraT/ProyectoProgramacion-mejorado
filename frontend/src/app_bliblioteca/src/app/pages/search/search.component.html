@@ -19,14 +19,14 @@
         </div>
         <div class="row">
             <div class="col-6">
-                <div class="rounded-button">Acción</div>
-                <div class="rounded-button">Fantasía</div>
-                <div class="rounded-button">Policial</div>
+                <div class="rounded-button" (click)="filterByGenre('Psicología')">Psicología</div>
+                <div class="rounded-button" (click)="filterByGenre('Fantasía')">Fantasía</div>
+                <div class="rounded-button" (click)="filterByGenre('Drama')">Drama</div>
             </div>
             <div class="col-6">
-                <div class="rounded-button">Ciencia Ficción</div>
-                <div class="rounded-button">Romance</div>
-                <div class="rounded-button">Terror</div>
+                <div class="rounded-button" (click)="filterByGenre('Historia')">Historia</div>
+                <div class="rounded-button" (click)="filterByGenre('Aventuras')">Aventuras</div>
+                <div class="rounded-button" (click)="filterByGenre('Misterio')">Misterio</div>
             </div>
         </div>
 
@@ -36,14 +36,14 @@
         </div>
         <div class="row">
             <div class="col-6">
-                <div class="rounded-button">J.K.Rowling</div>
-                <div class="rounded-button">Edgar Allan Poe</div>
-                <div class="rounded-button">Dan Brown</div>
+                <div class="rounded-button" (click)="filterByAuthor('J.K Rowling')">J.K Rowling</div>
+                <div class="rounded-button" (click)="filterByAuthor('Isabel Allende')">Isabel Allende</div>
+                <div class="rounded-button" (click)="filterByAuthor('Dan Brown')">Dan Brown</div>
             </div>
             <div class="col-6">
-                <div class="rounded-button">Ken Follet</div>
-                <div class="rounded-button">J.R.R. Tolkien</div>
-                <div class="rounded-button">Miguel de Cervantes</div>
+                <div class="rounded-button" (click)="filterByAuthor('Carl Gustav')">Carl Gustav</div>
+                <div class="rounded-button" (click)="filterByAuthor('J.R.R Tolkien')">J.R.R Tolkien</div>
+                <div class="rounded-button" (click)="filterByAuthor('Homero')">Homero</div>
             </div>
         </div>
     </div>

@@ -65,4 +65,32 @@ export class SearchComponent {
       this.searchResults = [];
     }
   }
+
+  filterByGenre(genero: string) {
+  this.bookService.getBooks(1, { genero }).subscribe(
+    (response: any) => {
+      this.searchResults = response.libros || [];
+      this.showDropdown = this.searchResults.length > 0;
+    },
+    (error) => {
+      console.error('Error al filtrar por género:', error);
+      this.searchResults = [];
+      this.showDropdown = false;
+    }
+  );
+}
+
+filterByAuthor(autor: string) {
+  this.bookService.getBooks(1, { autor }).subscribe(
+    (response: any) => {
+      this.searchResults = response.libros || [];
+      this.showDropdown = this.searchResults.length > 0;
+    },
+    (error) => {
+      console.error('Error al filtrar por autor:', error);
+      this.searchResults = [];
+      this.showDropdown = false;
+    }
+  );
+}
 }
