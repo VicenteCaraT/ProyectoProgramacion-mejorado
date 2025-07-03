@@ -69,9 +69,11 @@ class Libros(Resource):
         if genero:
             libros_query = libros_query.filter(LibroModel.genero.like(f"%{genero}%"))
         if autor:
+            autor_lower = autor.lower()
             libros_query = libros_query.join(LibroModel.fk_idAutor).filter(
-                func.lower(AutorModel.nombre).like(f"%{autor.lower()}%") |
-                func.lower(AutorModel.apellido).like(f"%{autor.lower()}%")
+                func.lower(AutorModel.nombre).like(f"%{autor_lower}%") |
+                func.lower(AutorModel.apellido).like(f"%{autor_lower}%") |
+                func.lower(AutorModel.apodo).like(f"%{autor_lower}%")
             )
         if titulo:
             libros_query = libros_query.filter(LibroModel.titulo.like(f"%{titulo}%"))
