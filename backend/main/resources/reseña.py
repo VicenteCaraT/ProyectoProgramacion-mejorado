@@ -88,6 +88,8 @@ class Reseñas(Resource):
         reseña_usuario = request.args.get('idUserPost')
         reseña_x_fecha = request.args.get('fechaReseña')
         reseña_libro = request.args.get('idLibro')
+        nombre_usuario = request.args.get('nombre_usuario')
+        titulo_libro = request.args.get('titulo_libro')
 
         #reseñas n/5
         if request.args.get("nroValoracion"):
@@ -108,6 +110,16 @@ class Reseñas(Resource):
         # Reseñas por libro
         if reseña_libro:
             reseñas = reseñas.filter(ReseñaModel.fk_idLibro == reseña_libro)
+        
+        if titulo_libro:
+            reseñas = reseñas.join(ReseñaModel.fk_libro_reseña).filter(
+            func.lower(LibroModel.titulo).like(f"%{titulo_libro.lower()}%")
+        )
+        
+        if nombre_usuario:
+            reseñas = reseñas.join(UsuarioModel, ReseñaModel.fk_idUser == UsuarioModel.idUser).filter(
+            func.lower(UsuarioModel.user).like(f"%{nombre_usuario.lower()}%")
+            )
 
 
         ### FIN FILTROS ####
