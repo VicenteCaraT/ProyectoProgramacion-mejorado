@@ -13,7 +13,7 @@ export class ReseñasService {
     private httpClient: HttpClient
   ) { }
 
-  getReviews(page: number, params?: {nroValoracion?:string, ordenValoracion?:string, idUserPost?:string, fechaReseña?:string, Valoraciones_desc?:string, Valoraciones_asc?:string, idLibro?: string}){
+  getReviews(page: number, params?: {nroValoracion?:string, ordenValoracion?:string, idUserPost?:string, fechaReseña?:string, Valoraciones_desc?:string, Valoraciones_asc?:string, idLibro?: string, titulo_libro?:string, nombre_usuario?:string}){
     let auth_token = localStorage.getItem('token')
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -56,6 +56,17 @@ export class ReseñasService {
         httpParams = httpParams.set('idLibro', params.idLibro)
       }
     }
+    if (params) {
+      if (params.nombre_usuario) {
+        httpParams = httpParams.set('nombre_usuario', params.nombre_usuario)
+      }
+    }
+    if (params) {
+      if (params.titulo_libro) {
+        httpParams = httpParams.set('titulo_libro', params.titulo_libro)
+      }
+    }
+    
     
     return this.httpClient.get(`${this.url}/reseñas`, {headers: headers, params: httpParams}).pipe(first())
   }

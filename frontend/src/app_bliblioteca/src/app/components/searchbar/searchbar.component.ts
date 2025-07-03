@@ -71,6 +71,13 @@ export class SearchbarComponent implements OnChanges{
             { type: 'estado', value: '1', label: 'Bloqueado' }
           ];
           break;
+        case 'reseñas':
+          this.filterOptions = [
+            clearFilterOption,
+            { type: 'ordenValoracion', value: 'Valoraciones_desc', label: 'Reseñas + a -' },
+            { type: 'ordenValoracion', value: 'Valoraciones_asc', label: 'Reseñas - a +' },
+          ];
+        break;
       default:
         this.filterOptions = [];
     }

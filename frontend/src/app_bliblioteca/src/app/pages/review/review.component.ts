@@ -61,12 +61,12 @@ export class ReviewComponent implements OnInit{
     } else if (event.action === 'delete') {
       this.reviewService.deleteReview(event.review.id).subscribe({
         next: () => {
-          this.sysNotificationService.showSuccess('Libro eliminado correctamente')
+          this.sysNotificationService.showSuccess('Reseña eliminada correctamente')
           this.fetchReviews(this.currentPage, this.currentFilter);
         },
         error: (err) => {
           console.error('Error al eliminar el libro', err)
-          this.sysNotificationService.showError('Error al eliminar el libro')
+          this.sysNotificationService.showError('Error al eliminar la reseña')
         }
       })
     }
@@ -103,4 +103,60 @@ export class ReviewComponent implements OnInit{
         }
       });
     }
+
+  handleSearch(query:string) {
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+
+      const paramsList = [
+        { titulo_libro: query },
+        { nombre_usuario: query }
+      ];
+
+      const allResults: any[] = [];
+      const seenIds = new Set<number>();
+      let pending = paramsList.length;
+
+      for ( const params of paramsList) {
+        this.reviewService.getReviews(1, params).subscribe(
+          (response: any) => {
+            if (response && response.reseñas) {
+              for (const reseña of response.reseñas) {
+                if(!seenIds.has(reseña.id)) {
+                  seenIds.add(reseña.id);
+                  allResults.push(reseña)
+                }
+              }
+            }
+            pending--;
+            if(pending === 0) {
+              this.filteredReviews = allResults;
+            }
+          },
+          (error) => {
+            console.error('Error de búsqueda', error);
+            pending--;
+            if (pending === 0) {
+              this.filteredReviews = allResults;
+            }
+          }
+        );
+      }
+    } else {
+      this.filteredReviews = [...this.reviewList]
+    }
+  }
+
+  handleFilterChange(option: { type: string, value: string }): void {
+    this.currentPage = 1;
+
+    if (option.value === '') {
+      this.currentFilter = null;
+      this.fetchReviews(this.currentPage);
+    } else {
+      this.currentFilter = { type: option.type, value: option.value };
+      const filterParams = { [option.type]: option.value };
+      this.fetchReviews(this.currentPage, filterParams);
+    }
+  }
 }
