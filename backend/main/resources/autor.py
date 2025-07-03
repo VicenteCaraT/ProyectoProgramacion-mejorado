@@ -44,11 +44,40 @@ class Autores(Resource):
     @handle_errors
     @jwt_required(optional=True)
     def get(self):
-        autores = db.session.query(AutorModel).all()
-        return {
-            "message": "Lista de autores obtenida",
-            "autores": [autor.to_json() for autor in autores]
-        }, 200
+        page = 1
+        per_page = 10
+        
+        autores = db.session.query(AutorModel)
+
+        if request.args.get('page'):
+            page = int(request.args.get('page'))
+        if request.args.get('per_page'):
+            per_page = int(request.args.get('per_page'))
+        
+        ## FILTROS ##
+        nombre = request.args.get("nombre")
+        apellido = request.args.get("apellido")
+        apodo = request.args.get("apodo")
+        
+        #Filtrado por nombre
+        if nombre:
+            autores = autores.filter(AutorModel.nombre.like(f"%{nombre}%"))
+        
+        #Filtrado por apellido
+        if apellido:
+            autores = autores.filter(AutorModel.apellido.like(f"%{apellido}%"))
+            
+        if apodo:
+            autores = autores.filter(AutorModel.apodo.like(f"%{apodo}%"))
+            
+        autores = autores.paginate(page=page, per_page=per_page, error_out=True)
+        
+        return jsonify({
+            'autores': [autor.to_json() for autor in autores],
+            'total': autores.total,
+            'pages': autores.pages,
+            'page': page
+        })
         
     @handle_errors
     @role_required(roles=["Admin"])
