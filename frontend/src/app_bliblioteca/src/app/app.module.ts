@@ -45,6 +45,7 @@ import { DetallesLibroComponent } from './pages/detalles-libro/detalles-libro.co
 import { RegisterModalComponent } from './components/modals/register-modal/register-modal.component';
 import { RatingComponent } from './components/rating/rating.component';
 import { SaveIconComponent } from './components/save-icon/save-icon.component';
+import { AutorComponent } from './pages/autor/autor.component';
 
 
 @NgModule({
@@ -83,6 +84,7 @@ import { SaveIconComponent } from './components/save-icon/save-icon.component';
     RegisterModalComponent,
     RatingComponent,
     SaveIconComponent,
+    AutorComponent,
   ],
   imports: [
     BrowserModule,

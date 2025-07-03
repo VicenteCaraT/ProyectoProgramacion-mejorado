@@ -1,6 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, Validator, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validator, Validators, ValidatorFn } from '@angular/forms';
+
+const onlyLetters: ValidatorFn = Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/);
+const onlyNumbers: ValidatorFn = Validators.pattern(/^\d+$/);
 
 @Component({
   selector: 'app-abm-modal',
@@ -28,8 +31,8 @@ export class AbmModalComponent {
         this.formEntity = this.formBuilder.group({
           img: [this.data.img || '', Validators.required],
           titulo: [this.data.titulo || '', Validators.required],
-          cantidad: [this.data.cantidad || '', Validators.required],
-          autor: [this.formOperation === 'edit' ? this.data.autor[0].id : '', Validators.required],
+          cantidad: [this.data.cantidad || '', [Validators.required, onlyNumbers]],
+          autor: [this.formOperation === 'edit' ? this.data.autor[0].id : '', [Validators.required, onlyNumbers]],
           editorial: [this.data.editorial || '', Validators.required],
           genero: [this.data.genero || '', Validators.required],
           sinopsis: [this.data.sinopsis || '', Validators.required],
@@ -38,10 +41,10 @@ export class AbmModalComponent {
       case 'loan':
         this.formTitle = this.formOperation === 'edit' ? 'Editar Préstamo' : 'Crear Prestamo';
         this.formEntity = this.formBuilder.group({
-          usuario: [this.formOperation === 'edit' ? this.data.usuario.id : '', Validators.required],
-          libro: [this.formOperation === 'edit' ? this.data.libro[0].id : '', Validators.required],
-          inicio_prestamo: [this.data.inicio_prestamo || '', Validators.required],
-          fin_prestamo: [this.data.fin_prestamo || '', Validators.required],
+          usuario: [this.formOperation === 'edit' ? this.data.usuario.id : '', [Validators.required, onlyNumbers]],
+          libro: [this.formOperation === 'edit' ? this.data.libro[0].id : '', [Validators.required, onlyNumbers]],
+          inicio_prestamo: [this.formatDate(this.data.inicio_prestamo) || '', Validators.required],
+          fin_prestamo: [this.formatDate(this.data.fin_prestamo) || '', Validators.required],
           estado: [this.data.estado || '', Validators.required]
         })
         break;
@@ -50,10 +53,10 @@ export class AbmModalComponent {
         this.formEntity = this.formBuilder.group({
           user: [this.data.user || '', Validators.required],
           ...(this.formOperation !== 'edit' && {contraseña: ['', Validators.required]}),
-          nombre: [this.data.nombre || '', Validators.required],
-          apellido: [this.data.apellido || '', Validators.required],
-          dni: [this.data.dni || '', Validators.required],
-          telefono: [this.data.telefono || '', Validators.required],
+          nombre: [this.data.nombre || '', [Validators.required, onlyLetters]],
+          apellido: [this.data.apellido || '', [Validators.required, onlyLetters]],
+          dni: [this.data.dni || '', [Validators.required, onlyNumbers]],
+          telefono: [this.data.telefono || '', [Validators.required, onlyNumbers]],
           email: [this.data.email || '', Validators.required],
           rol: [this.data.rol || '', Validators.required],
           img: [this.data.img || '', Validators.required],
@@ -66,14 +69,22 @@ export class AbmModalComponent {
           const valoracionNum = this.data.valoracion ? parseInt(this.data.valoracion.split('/')[0]) : '';
           // Define el formulario solo para editar reseña
           this.formEntity = this.formBuilder.group({
-        usuario: [this.data.usuario?.id || '', Validators.required],
-        libro: [this.data.libro?.id || '', Validators.required],
+        usuario: [this.data.usuario?.id || '', [Validators.required, onlyNumbers]],
+        libro: [this.data.libro?.id || '', [Validators.required, onlyNumbers]],
         descripcion: [this.data.descripcion || '', Validators.required],
-        valoracionNum: [valoracionNum, [Validators.required, Validators.min(1), Validators.max(5)]]
+        valoracionNum: [valoracionNum, [Validators.required, Validators.min(1), Validators.max(5), onlyNumbers]]
           });
         } else {
           throw new Error('Solo se permite editar reseñas');
         }
+        break;
+        case 'autor':
+          this.formTitle = this.formOperation === 'edit' ? 'Editar Autor' : 'Agregar Autor';
+          this.formEntity = this.formBuilder.group({
+            nombre: [this.data.nombre || '', [Validators.required, onlyLetters]],
+            apellido: [this.data.apellido || '', [Validators.required, onlyLetters]],
+            apodo: [this.data.apodo || '', Validators.required]
+          });
         break;
 
       default:
@@ -98,9 +109,10 @@ export class AbmModalComponent {
     this.dialogRef.close(formData);
   }
 
-  formatDate(dateStr: string): string {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}-${month}-${year}`;
+  formatDate(dateString: string | undefined): string {
+    if (!dateString || !dateString.includes('-')) return '';
+    const [day, month, year] = dateString.split('-');
+    return `${year}-${month}-${day}`;
   }
 
   saveChanges(): void {
@@ -116,6 +128,22 @@ export class AbmModalComponent {
 
       console.log('Formulario enviado:', formData);
       this.handleSave(formData);
+    }
+  }
+
+  allowOnlyLetters(event: KeyboardEvent) {
+    const pattern = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
+    const inputChar = String.fromCharCode(event.keyCode || event.which);
+    if (!pattern.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
+
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const pattern = /^[0-9]*$/;
+    const inputChar = String.fromCharCode(event.keyCode || event.which);
+    if (!pattern.test(inputChar)) {
+      event.preventDefault();
     }
   }
 }

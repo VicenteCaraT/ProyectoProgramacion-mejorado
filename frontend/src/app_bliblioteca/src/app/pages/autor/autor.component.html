@@ -1,0 +1,13 @@
+<app-navbar></app-navbar>
+    <div class="container">
+        <app-searchbar [currentPage]="'autores'" (searchEvent)="handleSearch($event)"></app-searchbar>
+
+        <h2>Administrar Autores</h2>
+
+        <div class="autor-list">
+            <app-catalogo-item *ngFor="let autor of filteredAutor" [autor]="autor" (actionEvent)="handleActionEvent($event)"></app-catalogo-item>
+        </div>
+        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)"></app-pagination>
+    </div>
+
+    <app-add-icon (addEvent)="openABMautorModal($event, 'create')"></app-add-icon>

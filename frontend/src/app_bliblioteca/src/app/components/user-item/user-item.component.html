@@ -41,6 +41,7 @@
 <!-- Mostrar dropdown sólo si showDropdown es true (cuando no es reseña) -->
 <div *ngIf="showDropdown && !isReviewPage" [id]="user.id" class="collapse user-adm-dropdown">
     <div class="p-3">
+        <p>ID: {{user.id}}</p>
         <p>DNI: {{ user.dni }}</p>
         <p>Tel: {{ user.telefono }}</p>
         <p>Email: {{ user.email }}</p>
