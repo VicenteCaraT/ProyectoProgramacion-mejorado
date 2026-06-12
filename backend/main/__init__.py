@@ -5,6 +5,7 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
+from flask_cors import CORS
 
 api = Api()
 #se inicializa SQL
@@ -17,6 +18,7 @@ mailsender = Mail()
 #Inicializa la app , todos lo modulos y recursos
 def create_app():
     app = Flask(__name__)
+    CORS(app, origins=["http://localhost:4200"])
     load_dotenv() 
     
     #Si no existe el archivo de base de datos crearlo (solo válido si se utiliza SQLite)
