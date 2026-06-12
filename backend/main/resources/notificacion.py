@@ -63,7 +63,8 @@ class Notificaciones(Resource):
         notificacion = NotificacionModel.from_json(request.get_json())
         db.session.add(notificacion)
         db.session.commit()
-        print(notificacion)
+        from flask import current_app
+        current_app.logger.info(f"Notificación creada: {notificacion}")
         return {
             "message": "Notificación creada exitosamente.",
             "notificacion": notificacion.to_json()

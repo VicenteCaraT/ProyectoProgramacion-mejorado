@@ -119,7 +119,8 @@ class Usuarios(Resource):
         usuario = UsuarioModel.from_json(request.get_json())
         db.session.add(usuario)
         db.session.commit()
-        print(usuario)
+        from flask import current_app
+        current_app.logger.info(f"Usuario creado: {usuario}")
         return {
             "message": "Usuario creado exitosamente.",
             "usuario": usuario.to_json()

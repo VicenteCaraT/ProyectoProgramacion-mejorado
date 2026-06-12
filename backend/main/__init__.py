@@ -62,4 +62,7 @@ def create_app():
     from main.auth import routes
     app.register_blueprint(routes.auth)
 
+    from .logging_config import setup_logging
+    setup_logging(app)
+
     return app

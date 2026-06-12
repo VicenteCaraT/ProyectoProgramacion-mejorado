@@ -138,7 +138,8 @@ class Reseñas(Resource):
         reseña = ReseñaModel.from_json(request.get_json())
         db.session.add(reseña)
         db.session.commit()
-        print(reseña)
+        from flask import current_app
+        current_app.logger.info(f"Reseña creada: {reseña}")
         return {
             "message": "Reseña creada exitosamente.",
             "reseña": reseña.to_json()
