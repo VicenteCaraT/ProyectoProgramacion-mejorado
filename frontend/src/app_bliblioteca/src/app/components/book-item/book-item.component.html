@@ -1,5 +1,5 @@
 <div class="book-item d-flex">
-    <div *ngIf="book.rank" class="book-top-number">{{ book.rank }}.</div> <!-- Mostrar el número de posición solo si existe -->
+    <div *ngIf="book.rank" class="book-top-number">{{ book.rank }}.</div>
     <img [src]="book.img" alt="{{ book.titulo }}" class="img-fluid">
     <div class="book-info">
         <h3>{{ book.titulo }}</h3>
@@ -7,12 +7,11 @@
         <p class="synopsis">{{ book.sinopsis }}</p>
         <div class="rating-save d-flex align-items-center">
             <div class="rating me-2">
-                <i *ngFor="let star of [].constructor(book.rating); let j = index" class="fas fa-star"></i>
+                <app-rating [valor]="book.promedio_valoracion"></app-rating>
             </div>
-            <span class="reviews">({{ book.reviews }} reseñas)</span>
         </div>
-        <div class="save-icon ms-auto">
-            <i class="fas fa-bookmark"></i>
-        </div>
+            <div class="save-icon">
+                <app-save-icon [libroID]="book.id"></app-save-icon>
+            </div>
     </div>
 </div>

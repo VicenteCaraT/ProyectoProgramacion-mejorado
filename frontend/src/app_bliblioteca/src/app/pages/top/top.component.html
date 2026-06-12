@@ -1,7 +1,5 @@
 <app-navbar></app-navbar>
 
-<app-categories></app-categories>
-
     <!-- Contenedor principal -->
     <div class="container mt-3">
 
@@ -12,7 +10,9 @@
         <section class="top-books">
             <app-book-item
                 *ngFor="let book of bookList"
-                [book]="book">
+                [book]="book"
+                (click)="goToBook(book.id)">
             </app-book-item>
         </section>
+        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)"></app-pagination>
     </div>

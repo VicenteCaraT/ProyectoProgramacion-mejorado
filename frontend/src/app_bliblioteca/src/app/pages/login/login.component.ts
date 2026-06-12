@@ -34,16 +34,21 @@ export class LoginComponent {
         // Decodifica el token para obtener roles y demas cosas
         let tokenPayload: any = jwtDecode(rta.access_token);
         localStorage.setItem('token_rol', tokenPayload.rol);
-        localStorage.setItem('user_id', tokenPayload.id)
+        localStorage.setItem('user_id', tokenPayload.id);
+        localStorage.setItem('estado_user', tokenPayload.estado)
 
         // Si el usuario tiene rol "Pendiente" no puede entrar a la pagina
-        if (tokenPayload.rol === 'Pendiente') {
-          alert('Su usuario debe ser aceptado por un administrador.')
+        if (tokenPayload.rol === 'Pendiente' || tokenPayload.estado === true) {
+          alert(tokenPayload.rol === 'Pendiente'
+            ? 'Su usuario debe ser aceptado por un administrador.'
+            : 'Su usuario se encuentra bloqueado.');
+          
           localStorage.removeItem('token');
           localStorage.removeItem('token_rol');
           localStorage.removeItem('user_id');
+          localStorage.removeItem('estado_user');
         } else {
-          this.router.navigateByUrl('home')
+          this.router.navigateByUrl('home');
         }
       }, error: (err: any) => {
         alert('Usuario o constraseña Incorrecta');

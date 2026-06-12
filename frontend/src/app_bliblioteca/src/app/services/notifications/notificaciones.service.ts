@@ -12,7 +12,7 @@ export class NotificacionesService {
     private httpClient: HttpClient,
   ) { }
 
-  getNotification(page: number, params?: {usuario:string}) {
+  getNotifications(page: number, params?: {usuario:string}) {
     let auth_token = localStorage.getItem('token')
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -20,13 +20,20 @@ export class NotificacionesService {
     })
     let httpParams = new HttpParams().set('page', page.toString());
 
-    if (params) {
-      if (params.usuario) {
-        httpParams = httpParams.set('usuario', params.usuario)
-      }
+    if (params?.usuario) {
+      httpParams = httpParams.set('usuario', params.usuario);
     }
 
-    this.httpClient.get(`${this.url}/notificacion`, {headers: headers})
+    return this.httpClient.get(`${this.url}/notificaciones`, {headers: headers, params: httpParams})
+  }
+
+  getNotificationByIs(id: number) {
+    let auth_token = localStorage.getItem('token')
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${auth_token}`
+    })
+    return this.httpClient.get(`${this.url}/notificacion/${id}`, {headers: headers}).pipe(first())
   }
 
   postNotification(page: number, params?: {idUsuario:string}) {
@@ -35,7 +42,16 @@ export class NotificacionesService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    this.httpClient.post(`${this.url}/notificacion`, {headers: headers})
+    return this.httpClient.post(`${this.url}/notificaciones`, {headers: headers})
+  }
+
+  deleteNotification(id: number) {
+    let auth_token = localStorage.getItem('token')
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${auth_token}`
+    })
+    return this.httpClient.delete(`${this.url}/notificacion/${id}`, {headers: headers}).pipe(first())
   }
 
 }

@@ -17,7 +17,8 @@ class Usuario(db.Model):
     notificaciones_user = db.relationship("Notificacion", back_populates="fk_user_notificacion", cascade="all, delete-orphan")
     prestamos_user = db.relationship("Prestamo", back_populates="fk_user_prestamo", cascade="all, delete-orphan")
     reseñas_user = db.relationship("Reseña", back_populates="fk_user_reseña", cascade="all, delete-orphan")
-
+    guardados_user = db.relationship("Guardado", back_populates="fk_user_guardado", cascade="all, delete-orphan")
+    
     def __repr__(self):
         return (
             f"<id: {self.idUser}, User: {self.user}, Contraseña: {self.contraseña}, Nombre: {self.nombre},"

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -10,28 +11,86 @@ export class SearchComponent {
   showDropdown: boolean = false;
   searchResults: any[] = [];
 
-  constructor(private bookService: LibrosService) {}
+  constructor(private bookService: LibrosService, private router: Router) {}
+
+  goToBook(bookID: string) {
+    this.router.navigate(['/libro', bookID])
+  }
 
   handleSearch(query: string) {
     if (query) {
-      this.bookService.getBooks(1, { titulo: query }).subscribe(
-        (response: any) => {          
-          if (response && response.libros) {
-            this.searchResults = response.libros;
-          } else {
-            this.searchResults = [];
+      const lowerQuery = query.toLowerCase();
+
+      const paramsList = [
+        { titulo: query },
+        { autor: query },
+        { genero: query },
+        { editorial: query }
+      ];
+
+      const allResults: any[] = [];
+      const seenIds = new Set();
+      let pending = paramsList.length;
+
+      for (const params of paramsList) {
+        this.bookService.getBooks(1, params).subscribe(
+          (response: any) => {
+            if (response && response.libros) {
+              for (const libro of response.libros) {
+                if (!seenIds.has(libro.id)) {
+                  seenIds.add(libro.id);
+                  allResults.push(libro);
+                }
+              }
+            }
+
+            pending--;
+            if (pending === 0) {
+              this.searchResults = allResults;
+              this.showDropdown = this.searchResults.length > 0;
+            }
+          },
+          (error) => {
+            console.error('Error al buscar libros:', error);
+            pending--;
+            if (pending === 0) {
+              this.searchResults = allResults;
+              this.showDropdown = this.searchResults.length > 0;
+            }
           }
-          this.showDropdown = this.searchResults.length > 0;
-        },
-        (error) => {
-          console.error('Error al buscar libros:', error);
-          this.searchResults = [];
-          this.showDropdown = false;
-        }
-      );
+        );
+      }
     } else {
       this.showDropdown = false;
       this.searchResults = [];
     }
   }
+
+  filterByGenre(genero: string) {
+  this.bookService.getBooks(1, { genero }).subscribe(
+    (response: any) => {
+      this.searchResults = response.libros || [];
+      this.showDropdown = this.searchResults.length > 0;
+    },
+    (error) => {
+      console.error('Error al filtrar por género:', error);
+      this.searchResults = [];
+      this.showDropdown = false;
+    }
+  );
+}
+
+filterByAuthor(autor: string) {
+  this.bookService.getBooks(1, { autor }).subscribe(
+    (response: any) => {
+      this.searchResults = response.libros || [];
+      this.showDropdown = this.searchResults.length > 0;
+    },
+    (error) => {
+      console.error('Error al filtrar por autor:', error);
+      this.searchResults = [];
+      this.showDropdown = false;
+    }
+  );
+}
 }

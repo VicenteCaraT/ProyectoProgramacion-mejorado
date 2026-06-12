@@ -3,7 +3,7 @@ from flask import request, jsonify
 from .. import db
 from main.models import LibroModel, AutorModel
 from sqlalchemy import func, desc
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required
 
 #LIBROS = {
@@ -14,11 +14,14 @@ from flask_jwt_extended import jwt_required
 
 class Libro(Resource):
     
-    @jwt_required(optional=True)
+    # Cambiado el jwt ya que un usuario sin rol puede ingresar al home
+    #@jwt_required(optional=True)
+    @handle_errors
     def get(self, id):
         libro = db.session.query(LibroModel).get_or_404(id)
         return libro.to_json()
     
+    @handle_errors
     @role_required(roles=["Admin"])
     def put(self, id):
         libro = db.session.query(LibroModel).get_or_404(id)
@@ -32,8 +35,12 @@ class Libro(Resource):
                 setattr(libro, key, value)
         db.session.add(libro)
         db.session.commit()
-        return libro.to_json() , 201
+        return {
+            "message": "Libro actualizado correctamente.",
+            "libro": libro.to_json()
+        }, 200
 
+    @handle_errors
     @role_required(roles=["Admin"])
     def delete(self, id):
         libro = db.session.query(LibroModel).get_or_404(id)
@@ -42,53 +49,65 @@ class Libro(Resource):
         return '', 204
 
 class Libros(Resource):
-    @jwt_required(optional=True)
+    
+    @handle_errors
     def get(self):
-        page = 1
-        per_page = 10
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
 
-        libros = db.session.query(LibroModel)
-
-        if request.args.get('page'):
-            page = int(request.args.get('page'))
-        if request.args.get('per_page'):
-            per_page = int(request.args.get('per_page'))
+        libros_query = db.session.query(LibroModel)
 
         ### FILTROS ###
         genero = request.args.get("genero")
         autor = request.args.get("autor")
         titulo = request.args.get("titulo")
         editorial = request.args.get("editorial")
+        orden = request.args.get("orden")
+        sin_stock = request.args.get("sin_stock")
         
-        
-        #genero
+        # Filtros de búsqueda
         if genero:
-            libros=libros.filter(LibroModel.genero.like("%"+genero+"%"))
-        
-        #autor 
+            libros_query = libros_query.filter(LibroModel.genero.like(f"%{genero}%"))
         if autor:
-            autor_id = AutorModel.query.get_or_404(autor)
-            libros=libros.filter(LibroModel.fk_idAutor.contains(autor_id))
-
-        #titulo
+            autor_lower = autor.lower()
+            libros_query = libros_query.join(LibroModel.fk_idAutor).filter(
+                func.lower(AutorModel.nombre).like(f"%{autor_lower}%") |
+                func.lower(AutorModel.apellido).like(f"%{autor_lower}%") |
+                func.lower(AutorModel.apodo).like(f"%{autor_lower}%")
+            )
         if titulo:
-            libros = libros.filter(LibroModel.titulo.like("%"+titulo+"%"))
-
-        #editorial
+            libros_query = libros_query.filter(LibroModel.titulo.like(f"%{titulo}%"))
         if editorial:
-            libros = libros.filter(LibroModel.editorial.like("%"+editorial+"%"))
+            libros_query = libros_query.filter(LibroModel.editorial.like(f"%{editorial}%"))
+        if sin_stock == "true":
+            libros_query = libros_query.filter(LibroModel.cantidad == 0)
+        if orden == "mayor_stock":
+            libros_query = libros_query.order_by(LibroModel.cantidad.desc())
 
+        # Ordenar por ranking dinámico (promedio_valoracion)
+        libros = libros_query.all()
+        if orden == "ranking":
+            libros.sort(
+                key=lambda libro: (
+                    sum([float(r.valoracion.split('/')[0]) for r in libro.reseñas_libro]) / len(libro.reseñas_libro)
+                    if libro.reseñas_libro else 0
+                ),
+                reverse=True
+            )
+            
+        # Paginado manual
+        total = len(libros)
+        pages = (total + per_page - 1) // per_page
+        libros_paginados = libros[(page - 1) * per_page : page * per_page]
 
-        ### FIN FILTROS ###
-
-        libros = libros.paginate(page=page, per_page=per_page, error_out=True)
-
-        return jsonify({'libros' : [libro.to_json() for libro in libros],
-                    'total' : libros.total,
-                    'pages' : libros.pages,
-                    'page' : page
+        return jsonify({
+            'libros': [libro.to_json() for libro in libros_paginados],
+            'total': total,
+            'pages': pages,
+            'page': page
         })
     
+    @handle_errors
     @role_required(roles=["Admin"])
     def post(self):
         data = request.get_json()
@@ -100,11 +119,12 @@ class Libros(Resource):
                 autor_exist = [autor_exist]
             autores = AutorModel.query.filter(AutorModel.idAutor.in_(autor_exist)).all()
             libro.fk_idAutor.extend(autores)
-
         db.session.add(libro)
         db.session.commit()
-
-        return libro.to_json(), 201
-    
+        return {
+            "message": "Libro creado exitosamente.",
+            "libro": libro.to_json()
+        }, 201
+        
 if __name__ == '__main__':
     pass

@@ -4,7 +4,6 @@ h3 {
     color: #f1f1f1;
 }
 
-/* Boton pildora */
 .rounded-button {
     display: inline-block; 
     background-color: #444; 
@@ -26,51 +25,11 @@ h3 {
 }
 
 .rounded-button:hover {
-    background-color: #e5e05e; /* Color de fondo al pasar el mouse */
+    background-color: #e5e05e;
 }
 
 .rounded-button:active {
-    background-color: #F5F378; /* Color de fondo al hacer clic */
-    transform: scale(0.98); /* Escala ligeramente el botón al hacer clic */
+    background-color: #F5F378; 
+    transform: scale(0.98); 
 }
 
-.dropdown {
-    position: relative;
-}
-
-.dropdown-item {
-    display: flex;
-    background-color: #6C6C6C;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    position: relative; 
-    transition: transform 0.3s ease;
-    flex-wrap: wrap;
-    text-align: center;
-    margin: 5px;
-    color: #ffffff;
-}
-
-.dropdown-menu{
-    display: flex;
-    background-color: #444;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    position: relative; 
-    transition: transform 0.3s ease;
-    flex-wrap: wrap;
-    text-align: center;
-}
-
-.dropdown-menu.show {
-    display: block;
-}
-
-.book-img {
-    width: 80px;
-    height: 100px;
-    margin-right: 20px;
-    border-radius: 10px;
-}

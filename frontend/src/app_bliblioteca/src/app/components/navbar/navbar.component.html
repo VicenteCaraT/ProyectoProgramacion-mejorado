@@ -1,9 +1,12 @@
     <!-- Navbar -->
     <nav class="navbar navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" routerLink="/perfil">
-                <img [src]="user?.img" alt="User" class="rounded-circle me-2" width="40">
-                <span>{{ user?.nombre || 'Usuario' }}</span>
+            <a class="navbar-brand" (click)="checkUser($event)" style="cursor: pointer;">
+                <img *ngIf="user?.img; else noUserIcon" [src]="user.img" class="rounded-circle me-2" width="40" alt="User Image">
+                <ng-template #noUserIcon>
+                    <i class="fas fa-user-circle me-2"></i>
+                </ng-template>
+                <span>{{ user?.nombre ||  'Log In' }}</span>
             </a>
             <div class="d-flex align-items-center ms-auto">
                 <a routerLink="/notificaciones">
@@ -25,9 +28,13 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <span class="ms-2">Search</span>
                     </a>
-                    <a class="nav-link d-flex align-items-center" routerLink="/save">
+                    <a *ngIf="isUser()" class="nav-link d-flex align-items-center" routerLink="/save">
                         <i class="fa-solid fa-bookmark"></i>
-                        <span class="ms-2">Saved</span>
+                        <span class="ms-2">Saves</span>
+                    </a>
+                    <a class="nav-link d-flex align-items-center" routerLink="/top">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span class="ms-2">Top</span>
                     </a>
                     <a *ngIf="isAdmin()" class="nav-link d-flex align-items-center" routerLink="/tools">
                         <i class="fa-solid fa-gear"></i>

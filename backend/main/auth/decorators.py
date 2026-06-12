@@ -31,6 +31,19 @@ def add_claims_to_access_token(usuario):
     claims = {
         'rol': usuario.rol,
         'id': usuario.idUser,
-        'email': usuario.email
+        'email': usuario.email,
+        'estado': usuario.estado
     }
     return claims
+
+def handle_errors(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            return {
+                "message": "Se produjo un error",
+                "error": str(e)
+            }, 400
+    return wrapper

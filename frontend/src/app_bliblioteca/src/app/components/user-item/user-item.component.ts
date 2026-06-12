@@ -10,10 +10,10 @@ export class UserItemComponent {
   @Input() review: any;
   @Input() isReviewPage: boolean = false;
   @Input() showDropdown: boolean = true;
-  @Output() actionEvent = new EventEmitter<{action: string, user: any}>();
+  @Output() actionEvent = new EventEmitter<{action: string, user: any, review: any}>();
 
 
   handleEditDelete(action: string) {
-    this.actionEvent.emit({ action, user: this.user });
+    this.actionEvent.emit({ action, user: this.user, review: this.review});
   }
 }

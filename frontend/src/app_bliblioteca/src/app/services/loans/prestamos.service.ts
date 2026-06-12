@@ -12,7 +12,7 @@ export class PrestamosService {
     private httpClient: HttpClient,
   ) { }
 
-  getLoans(page: number, params?: {idUsuario?:string, inicio_prestamo?:string, fin_prestamo?:string, cant_libros?:string, libro_id?:string, cant_prestamos?:string, estado?:string, fecha_proxima?:string}) {
+  getLoans(page: number, params?: {idUsuario?:string, nombre_usuario?:string, inicio_prestamo?:string, fin_prestamo?:string, cant_libros?:string, libro_id?:string, cant_prestamos?:string, estado?:string, orden?:string, titulo_libro?:string}) {
     let auth_token = localStorage.getItem('token')
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -23,6 +23,12 @@ export class PrestamosService {
     if (params) {
       if (params.idUsuario) {
         httpParams = httpParams.set('idUsuario', params.idUsuario)
+      }
+    }
+
+    if (params) {
+      if (params.nombre_usuario) {
+        httpParams = httpParams.set('nombre_usuario', params.nombre_usuario)
       }
     }
 
@@ -51,6 +57,12 @@ export class PrestamosService {
     }
 
     if (params) {
+      if (params.titulo_libro) {
+        httpParams = httpParams.set('titulo', params.titulo_libro)
+      }
+    }
+
+    if (params) {
       if (params.cant_prestamos) {
         httpParams = httpParams.set('cant_prestamos', params.cant_prestamos)
       }
@@ -63,8 +75,8 @@ export class PrestamosService {
     }
 
     if (params) {
-      if (params.fecha_proxima) {
-        httpParams = httpParams.set('fecha_proxima', params.fecha_proxima)
+      if (params.orden) {
+        httpParams = httpParams.set('orden', params.orden)
       }
     }
     return this.httpClient.get(`${this.url}/prestamos`, {headers: headers, params:httpParams}).pipe(first())
@@ -107,4 +119,15 @@ export class PrestamosService {
     })
     return this.httpClient.delete(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
   }
+
+  patchLoans() {
+  let auth_token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${auth_token}`
+  });
+  return this.httpClient
+    .patch(`${this.url}/prestamos`, {}, { headers: headers })
+    .pipe(first());
+}
 }

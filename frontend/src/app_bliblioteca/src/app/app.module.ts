@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClientModule } from '@angular/common/http';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -40,6 +41,12 @@ import { CatalogoItemComponent } from './components/catalogo-item/catalogo-item.
 import { AbmModalComponent } from './components/modals/abm-modal/abm-modal.component';
 import { EditDeleteComponent } from './components/edit-delete/edit-delete.component';
 import { PaginationComponent } from './components/pagination/pagination.component';
+import { DetallesLibroComponent } from './pages/detalles-libro/detalles-libro.component';
+import { RegisterModalComponent } from './components/modals/register-modal/register-modal.component';
+import { RatingComponent } from './components/rating/rating.component';
+import { SaveIconComponent } from './components/save-icon/save-icon.component';
+import { AutorComponent } from './pages/autor/autor.component';
+
 
 @NgModule({
   declarations: [
@@ -73,6 +80,11 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     AbmModalComponent,
     EditDeleteComponent,
     PaginationComponent,
+    DetallesLibroComponent,
+    RegisterModalComponent,
+    RatingComponent,
+    SaveIconComponent,
+    AutorComponent,
   ],
   imports: [
     BrowserModule,
@@ -84,7 +96,8 @@ import { PaginationComponent } from './components/pagination/pagination.componen
     MatInputModule,
     MatSelectModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatSnackBarModule
   ],
   providers: [
     provideAnimationsAsync()

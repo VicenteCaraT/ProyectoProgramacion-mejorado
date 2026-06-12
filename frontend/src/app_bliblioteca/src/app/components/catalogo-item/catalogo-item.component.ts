@@ -7,10 +7,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class CatalogoItemComponent {
   @Input() book: any;
+  @Input() autor: any;
 
-  @Output() actionEvent = new EventEmitter<{action: string, book: any}>();
+  @Output() actionEvent = new EventEmitter<{action: string, book: any, autor: any}>();
 
   handleEditDelete(action: string) {
-    this.actionEvent.emit({ action, book: this.book });
+    this.actionEvent.emit({ action, book: this.book , autor: this.autor});
   }
 }

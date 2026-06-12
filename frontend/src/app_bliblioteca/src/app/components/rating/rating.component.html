@@ -1,0 +1,6 @@
+<span class="review-rating">
+    <ng-container *ngFor="let star of stars">
+        <i class="fas fa-star" [class.text-warning]="star" [class.text-muted]="!star"></i>
+    </ng-container>
+    ({{ valor }})
+</span>

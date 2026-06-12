@@ -6,7 +6,15 @@
         <!-- Barra de búsqueda -->
         <app-searchbar [currentPage]="'prestamo'" (searchEvent)="handleSearch($event)" (filterChange)="handleFilterChange($event)"></app-searchbar>
 
-        <h2>Préstamos</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Préstamos</h2>
+        <div class="actualizar-terminados" 
+            (click)="actualizarPrestamosVencidos()" 
+            *ngIf="isAdmin()" 
+            title="Actualizar préstamos vencidos">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+        </div>
         <section class="loans mb-3" *ngFor="let loan of filteredLoans" >
             <app-loan-item [loan]="loan" (actionEvent)="handleActionEvent($event)" (resena)="openRealizarResena($event)"></app-loan-item>
         </section>

@@ -4,6 +4,8 @@ import { CrearResenaComponent } from '../../components/modals/user-modals/crear-
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { PrestamosService } from '../../services/loans/prestamos.service';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
+import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -16,7 +18,10 @@ export class PrestamoComponent implements OnInit{
   constructor(
     private dialog: MatDialog,
     private loanService: PrestamosService,
-    private reviewService: ReseñasService
+    private reviewService: ReseñasService,
+    private sysNotificationService: SysNotificationService,
+    private route: ActivatedRoute
+
   ) {}
 
   loanList:any[] = []
@@ -25,16 +30,19 @@ export class PrestamoComponent implements OnInit{
   totalPages: number = 1;
 
   currentFilter: { type: string, value: string } | null = null;
+  baseParams: any = {};
 
   ngOnInit(): void {
     const tokenRol = localStorage.getItem('token_rol');
     const tokenUserId = localStorage.getItem('user_id');
+    const routeUserId = this.route.snapshot.queryParamMap.get('idUsuario');
 
-    const params = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : {};
-    this.fetchLoans(1, params);
+    this.baseParams = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : routeUserId ? { idUsuario: routeUserId } : {};
+    this.fetchLoans(1, this.baseParams);
     }
 
-    fetchLoans(page: number, params?: { estado?: string, idUsuario?: string }): void {
+    fetchLoans(page: number, extraParams: any = {}): void {
+      const params = {...this.baseParams, ...extraParams}
       this.loanService.getLoans(page, params).subscribe((rta: any) => {
         this.loanList = rta.prestamos || [];
         this.filteredLoans = [...this.loanList];
@@ -42,16 +50,48 @@ export class PrestamoComponent implements OnInit{
       });
     }
 
-  handleSearch(query: string) {
+  //areglar
+
+  handleSearch(query:string) {
     if (query) {
-      this.filteredLoans = this.loanList.filter(loan =>
-        loan.titulo.toLowerCase().includes(query.toLowerCase()) ||
-        loan.usuario.user.toLowerCase().includes(query.toLowerCase())      ||
-        loan.inicio_fecha.toLowerCase().includes(query.toLowerCase())  ||
-        loan.fin_fecha.toLowerCase().includes(query.toLowerCase())
-      );
+      const lowerQuery = query.toLowerCase();
+
+      const paramsList = [
+        { titulo_libro: query },
+        { nombre_usuario: query }
+      ];
+
+      const allResults: any[] = [];
+      const seenIds = new Set<number>();
+      let pending = paramsList.length;
+
+      for ( const params of paramsList) {
+        this.loanService.getLoans(1, params).subscribe(
+          (response: any) => {
+            if (response && response.prestamos) {
+              for (const prestamo of response.prestamos) {
+                if(!seenIds.has(prestamo.id)) {
+                  seenIds.add(prestamo.id);
+                  allResults.push(prestamo)
+                }
+              }
+            }
+            pending--;
+            if(pending === 0) {
+              this.filteredLoans = allResults;
+            }
+          },
+          (error) => {
+            console.error('Error de búsqueda', error);
+            pending--;
+            if (pending === 0) {
+              this.filteredLoans = allResults;
+            }
+          }
+        );
+      }
     } else {
-      this.filteredLoans = [...this.loanList];
+      this.filteredLoans = [...this.loanList]
     }
   }
 
@@ -65,10 +105,12 @@ export class PrestamoComponent implements OnInit{
     } else if (event.action === 'delete' || event.action === 'decline') {
       this.loanService.deleteLoan(event.loan.id).subscribe({
         next: () => {
+          this.sysNotificationService.showSuccess('Prestamo eliminado correctamente')
           this.refreshLoanList();
         },
         error: (err) => {
           console.error('Error al eliminar el prestamo', err)
+          this.sysNotificationService.showError('Error al eliminar el préstamo')
         }
       })
     }
@@ -85,49 +127,56 @@ export class PrestamoComponent implements OnInit{
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log('El modal se cerró', result); 
-      // arreglar porque al apretar close se hace el post igual
       if (result) {
         if (operation === 'create') {
-          this.loanService.postLoan(result).subscribe(() => {
-            this.refreshLoanList();
+          this.loanService.postLoan(result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Préstamo creado correctamente')
+              this.refreshLoanList();
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al crear el préstamo')
+            }
           });
         } else if (operation === 'edit') {
-          this.loanService.updateLoan(loanData.id, result).subscribe(() => {
-            this.refreshLoanList();
-          })
+          this.loanService.updateLoan(loanData.id, result).subscribe({
+            next: () => {
+              this.sysNotificationService.showSuccess('Préstamo editado correctamente')
+              this.refreshLoanList();
+            },
+            error: () => {
+              this.sysNotificationService.showError('Error al editar el préstamo')
+            }
+          });
         }
       }
     })
   }
 
   refreshLoanList(): void {
-    const tokenRol = localStorage.getItem('token_rol');
-    const tokenUserId = localStorage.getItem('user_id');
-    const params = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : {};
-
-    this.fetchLoans(this.currentPage, { ...params, ...(this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value } : {}) });
+    const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value } : {};
+    this.fetchLoans(this.currentPage, filterParams)
   }
 
   changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
-      this.fetchLoans(this.currentPage);
+      const filterParams = this.currentFilter ? { [this.currentFilter.type]: this.currentFilter.value } : {};
+      this.fetchLoans(this.currentPage, filterParams);
     }
   }
 
-  handleFilterChange(option: { type: string, value: string }): void {
-    let filters: any = {};
+    handleFilterChange(option: { type: string, value: string }): void {
+    this.currentPage = 1;
 
-    // Ajustar el manejo de tipos de filtro
-    if (option.value === 'Activo' || option.value === 'Desactivo' || option.value === 'Pendiente') {
-        filters.estado = option.value;
-    } else if (option.type === 'fecha_proxima') {
-        filters.fecha_proxima = option.value;
+    if (option.value === '') {
+      this.currentFilter = null;
+      this.fetchLoans(this.currentPage);
+    } else {
+      this.currentFilter = { type: option.type, value: option.value };
+      const filterParams = { [option.type]: option.value };
+      this.fetchLoans(this.currentPage, filterParams);
     }
-    
-    // Actualiza el filtro actual
-    this.currentFilter = { type: option.type, value: option.value };
-    this.fetchLoans(this.currentPage, filters);
   }
 
   openRealizarResena(loan: any): void {
@@ -148,18 +197,36 @@ export class PrestamoComponent implements OnInit{
     });
 }
 
-  // Arreglar put
   acceptLoan(loan: any) {
     this.loanService.updateLoan(loan.id, { estado: 'Activo' }).subscribe({
       next: () => {
         loan.estado = 'Activo';
+        this.sysNotificationService.showSuccess('Préstamo aceptado correctamente');
       },
       error: (error) => {
         console.error('Error al aceptar el préstamo', error);
-      },
-      complete: () => {
-        console.log('Prestamo acceptado');
+        this.sysNotificationService.showError('Error al aceptar el préstamo');
       }
     });
   }
+
+  actualizarPrestamosVencidos(): void {
+  this.loanService.patchLoans().subscribe({
+    next: (res: any) => {
+      this.sysNotificationService.showSuccess(res.message);
+      this.refreshLoanList()
+    },
+    error: () => {
+      this.sysNotificationService.showError("Error al actualizar préstamos");
+    }
+  });
+}
+  isAdmin() { 
+    const tokenRol = localStorage.getItem('token_rol');
+  if (tokenRol && tokenRol.includes("Admin")) {
+    return true;
+  } else {
+    return false;
+  }
+}
 }

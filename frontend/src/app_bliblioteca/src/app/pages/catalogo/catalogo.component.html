@@ -1,12 +1,12 @@
 <app-navbar></app-navbar>
 
     <div class="container">
-    <app-searchbar [currentPage]="'catalogo'" (searchEvent)="handleSearch($event)"></app-searchbar>
+    <app-searchbar [currentPage]="'catalogo'" (searchEvent)="handleSearch($event)" (filterChange)="handleFilterChange($event)"></app-searchbar>
 
         <h2>Administrar Catálogo Bibliotecario</h2>
 
         <div class="book-list">
-            <app-catalogo-item *ngFor="let book of bookList" [book]="book" (actionEvent)="handleActionEvent($event)"></app-catalogo-item>
+            <app-catalogo-item *ngFor="let book of filteredBook" [book]="book" (actionEvent)="handleActionEvent($event)"></app-catalogo-item>
         </div>
 
         <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)"></app-pagination>

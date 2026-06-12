@@ -8,16 +8,19 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class EditDeleteComponent {
   @Input() userRol: string = '';
   @Input() loanStatus: string = '';
+  @Input() isReviewPage: boolean = false;
   @Output() editDelete = new EventEmitter<string>();
 
 
-  isAdmin() { 
+  isAdminOrReview() {
     const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
+
+    // Mostrar botones si es Admin o si es la página de reseñas
+    if ((tokenRol && tokenRol.includes("Admin")) || this.isReviewPage) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   isPending() {

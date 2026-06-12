@@ -11,8 +11,9 @@
         <section class="saved-books">
             <app-book-item
                 *ngFor="let book of bookList"
-                [book]="book">
+                [book]="book"
+                (click)="goToBook(book.id)">
             </app-book-item>
         </section>
-        
+        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="changePage($event)"></app-pagination>
     </div>

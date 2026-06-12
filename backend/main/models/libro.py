@@ -16,11 +16,20 @@ class Libro(db.Model):
     genero = db.Column(db.String(60), nullable=False)
     sinopsis = db.Column(db.String(300), nullable=False)
     reseñas_libro = db.relationship("Reseña", back_populates="fk_libro_reseña", cascade="all, delete-orphan")
+    guardados_libro = db.relationship("Guardado", back_populates="fk_libro_guardado", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<id: {self.idLibro}, img: {self.book_img}, Titulo: {self.titulo}, Cantidad: {self.cantidad}, Autor: {self.fk_idAutor}, Editorial: {self.editorial}, Genero: {self.genero}, Sinopsis: {self.sinopsis}>"
 
     def to_json(self):
+        total_reseñas = len(self.reseñas_libro)
+        
+        if total_reseñas > 0:
+            promedio_valoracion = sum([
+                float(reseña.valoracion.split('/')[0]) for reseña in self.reseñas_libro
+            ]) / total_reseñas
+        else:
+            promedio_valoracion = 0 
         libro_json = {
             "id" : int(self.idLibro),
             "img" : str(self.book_img),
@@ -29,7 +38,9 @@ class Libro(db.Model):
             "autor" : [autor.to_json() for autor in self.fk_idAutor],
             "editorial" : str(self.editorial),
             "genero" : str(self.genero),
-            "sinopsis" : str(self.sinopsis)
+            "sinopsis" : str(self.sinopsis),
+            "total_reseñas" : total_reseñas,
+            "promedio_valoracion": round(promedio_valoracion, 2)
         }
         return libro_json
     

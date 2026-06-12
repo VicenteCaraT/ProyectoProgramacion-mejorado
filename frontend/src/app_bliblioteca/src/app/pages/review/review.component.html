@@ -2,7 +2,7 @@
 
 <!-- Contenedor principal -->
 <div class="container mt-3">
-    <app-searchbar></app-searchbar>
+    <app-searchbar [currentPage]="'reseñas'" (searchEvent)="handleSearch($event)" (filterChange)="handleFilterChange($event)"></app-searchbar>
     <h2>Administrar Reseñas</h2>
     <!-- Lista de reseñas -->
     <section class="user-adm" *ngFor="let review of filteredReviews">
@@ -10,7 +10,8 @@
             [user]="null" 
             [review]="review" 
             [isReviewPage]="true" 
-            [showDropdown]="true">
+            [showDropdown]="true"
+            (actionEvent)="handleActionEvent($event)">
         </app-user-item>
     </section>
 

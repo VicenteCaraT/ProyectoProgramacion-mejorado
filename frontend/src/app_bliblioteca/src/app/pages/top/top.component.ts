@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-top',
@@ -7,48 +8,38 @@ import { LibrosService } from '../../services/books/libros.service';
   styleUrl: './top.component.css'
 })
 export class TopComponent implements OnInit{
-  // topBooks = [
-  //   {
-  //     title: 'El señor de los Anillos',
-  //     author: 'J.R.R. Tolkien',
-  //     synopsis: 'Una épica de J.R.R. Tolkien donde Frodo Bolsón y sus compañeros intentan destruir un anillo maldito para salvar al mundo de la oscuridad.',
-  //     image: 'assets/señor_d_a.jpeg',
-  //     rating: 5,
-  //     reviews: 392,
-  //     rank: 1
-  //   },
-  //   {
-  //     title: 'El Código Da Vinci',
-  //     author: 'Dan Brown',
-  //     synopsis: 'Un thriller en el que un profesor de simbología investiga un asesinato en el Louvre y descubre un misterio que podría cambiar la historia.',
-  //     image: 'assets/codigo_d.jpeg',
-  //     rating: 5,
-  //     reviews: 235,
-  //     rank:2
-  //   },
-  //   {
-  //     title: 'Alicia en el País de Las Maravillas',
-  //     author: 'Lewis Carroll',
-  //     synopsis: 'Una joven llamada Alicia cae en un mundo fantástico lleno de personajes y situaciones absurdas, donde vive una serie de aventuras surrealistas.',
-  //     image: 'assets/alicia.jpeg',
-  //     rating: 5,
-  //     reviews: 281,
-  //     rank:3
-  //   },
-  // ];
 
   constructor(
     private bookService: LibrosService,
+    private router: Router
   ) {}
 
-  bookList:any[] = []
-  filteredBook:any = []
+  bookList: any[] = [];
+  filteredBook: any[] = [];
+  currentPage: number = 1;
+  totalPages: number = 1;
 
   ngOnInit(): void {
-    this.bookService.getBooks(1).subscribe((rta: any) => {
-      console.log("Libros Api: ", rta);
+    this.fetchTopBooks(1);
+  }
+
+  fetchTopBooks(page: number): void {
+    this.bookService.getBooks(page, { orden: 'ranking' }).subscribe((rta: any) => {
+      console.log("Libros API:", rta);
       this.bookList = rta.libros || [];
-      this.filteredBook = [...this.bookList]
-    })
-}
+      this.filteredBook = [...this.bookList];
+      this.totalPages = rta.pages;
+    });
+  }
+
+  changePage(newPage: number): void {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.currentPage = newPage;
+      this.fetchTopBooks(this.currentPage);
+    }
+  }
+
+  goToBook(bookID: string): void {
+    this.router.navigate(['/libro', bookID]);
+  }
 }

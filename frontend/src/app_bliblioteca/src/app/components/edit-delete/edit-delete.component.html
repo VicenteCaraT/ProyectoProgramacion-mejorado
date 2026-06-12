@@ -1,4 +1,4 @@
-<div class="edit-delete d-flex" *ngIf="isAdmin()">
+<div class="edit-delete d-flex" *ngIf="isAdminOrReview()">
     <ng-container *ngIf="isPending() ; else adminButtons">
         <!-- Icono de Aceptar -->
         <a class="accept-icon" (click)="emitAcceptClick()">

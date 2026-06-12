@@ -5,20 +5,13 @@
     <h2 class="fw-regular">Search</h2>
 
 <!-- Mostrar resultados de búsqueda en un dropdown -->
-  <div *ngIf="showDropdown" class="search-dropdown">
-        <ul class="dropdown-menu show" style="display: block; position: relative;">
-            <li *ngFor="let book of searchResults" class="dropdown-item">
-                <div class="d-flex align-items-start">
-                    <img [src]="book.img" alt="{{ book.titulo }}" class="book-img">
-                    <div class="ms-3">
-                        <p class="mb-1"><strong>{{ book.titulo }}</strong></p>
-                        <p class="mb-0">by {{ book.autor[0].apodo }}</p>
-                    </div>
-                </div>
-            </li>
-        </ul>
+    <div *ngIf="showDropdown" class="search-dropdown w-100">
+        <app-book-item
+        *ngFor="let book of searchResults"
+        [book]="book"
+        (click)="goToBook(book.id)">
+        </app-book-item>
     </div>
-
     <!-- Explorar Géneros -->
     <div *ngIf="!showDropdown">
         <div class="section-title">
@@ -26,14 +19,14 @@
         </div>
         <div class="row">
             <div class="col-6">
-                <div class="rounded-button">Acción</div>
-                <div class="rounded-button">Fantasía</div>
-                <div class="rounded-button">Policial</div>
+                <div class="rounded-button" (click)="filterByGenre('Psicología')">Psicología</div>
+                <div class="rounded-button" (click)="filterByGenre('Fantasía')">Fantasía</div>
+                <div class="rounded-button" (click)="filterByGenre('Drama')">Drama</div>
             </div>
             <div class="col-6">
-                <div class="rounded-button">Ciencia Ficción</div>
-                <div class="rounded-button">Romance</div>
-                <div class="rounded-button">Terror</div>
+                <div class="rounded-button" (click)="filterByGenre('Historia')">Historia</div>
+                <div class="rounded-button" (click)="filterByGenre('Aventuras')">Aventuras</div>
+                <div class="rounded-button" (click)="filterByGenre('Misterio')">Misterio</div>
             </div>
         </div>
 
@@ -43,14 +36,14 @@
         </div>
         <div class="row">
             <div class="col-6">
-                <div class="rounded-button">J.K.Rowling</div>
-                <div class="rounded-button">Edgar Allan Poe</div>
-                <div class="rounded-button">Dan Brown</div>
+                <div class="rounded-button" (click)="filterByAuthor('J.K Rowling')">J.K Rowling</div>
+                <div class="rounded-button" (click)="filterByAuthor('Isabel Allende')">Isabel Allende</div>
+                <div class="rounded-button" (click)="filterByAuthor('Dan Brown')">Dan Brown</div>
             </div>
             <div class="col-6">
-                <div class="rounded-button">Ken Follet</div>
-                <div class="rounded-button">J.R.R. Tolkien</div>
-                <div class="rounded-button">Miguel de Cervantes</div>
+                <div class="rounded-button" (click)="filterByAuthor('Carl Gustav')">Carl Gustav</div>
+                <div class="rounded-button" (click)="filterByAuthor('J.R.R Tolkien')">J.R.R Tolkien</div>
+                <div class="rounded-button" (click)="filterByAuthor('Homero')">Homero</div>
             </div>
         </div>
     </div>

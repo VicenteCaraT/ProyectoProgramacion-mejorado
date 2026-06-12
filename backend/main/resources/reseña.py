@@ -5,24 +5,27 @@ from main.models import ReseñaModel, UsuarioModel, LibroModel
 import regex
 from datetime import datetime
 from sqlalchemy import func, desc, asc
-from main.auth.decorators import role_required
+from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 #implementar envio de mail
 
 class Reseña(Resource):
+    
+    @handle_errors
     @jwt_required(optional=True)
     def get(self, id):
         reseña = db.session.query(ReseñaModel).get_or_404(id)
         return reseña.to_json()
     
-    @role_required(roles=["Usuario"])
+    @handle_errors
+    @role_required(roles=["Usuario", "Admin"])
     # el usuario se puede modificar, solo a si mismo
     def put(self, id):
         reseña = db.session.query(ReseñaModel).get_or_404(id)
         data = request.get_json()
         current_user_id = get_jwt_identity()
-        if int(current_user_id) != reseña.fk_idUser:
+        if int(current_user_id) != int(reseña.fk_idUser) and "Admin" not in get_jwt().get('rol', []):
             return {'message' : 'No tienes permiso para modificar la reseña de este usuario'}
         nuevo_usuario_id = data.get('usuario')
         
@@ -43,8 +46,12 @@ class Reseña(Resource):
 
         db.session.add(reseña)
         db.session.commit()
-        return reseña.to_json(), 201
-
+        return {
+            "message": f"Reseña con ID {id} actualizada correctamente.",
+            "reseña": reseña.to_json()
+        }, 200
+        
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     # el usuario puede borrar la reseña, solo a si mismo
     # el admin o bibliotecario puede borrar cualquiera
@@ -52,15 +59,16 @@ class Reseña(Resource):
         current_user_id = get_jwt_identity()
         reseña = db.session.query(ReseñaModel).get_or_404(id)
         # Verificar permisos
-        if int(current_user_id) != int(reseña.fk_idUser) and "Admin" not in get_jwt().get('roles', []):
+        if int(current_user_id) != int(reseña.fk_idUser) and "Admin" not in get_jwt().get('rol', []): #cambiado reles por rol
             return {'message': 'No tiene permisos para borrar esta reseña'}, 403
         db.session.delete(reseña)
         db.session.commit()
         return '', 204
 
 class Reseñas(Resource):
-    
-    @jwt_required(optional=True)
+    # cambiado jwt ya que un usuario sin rol puede ingresar al home y ver libros
+    # @jwt_required(optional=True)
+    @handle_errors
     def get(self):
         page = 1
         per_page = 10
@@ -80,6 +88,8 @@ class Reseñas(Resource):
         reseña_usuario = request.args.get('idUserPost')
         reseña_x_fecha = request.args.get('fechaReseña')
         reseña_libro = request.args.get('idLibro')
+        nombre_usuario = request.args.get('nombre_usuario')
+        titulo_libro = request.args.get('titulo_libro')
 
         #reseñas n/5
         if request.args.get("nroValoracion"):
@@ -100,6 +110,16 @@ class Reseñas(Resource):
         # Reseñas por libro
         if reseña_libro:
             reseñas = reseñas.filter(ReseñaModel.fk_idLibro == reseña_libro)
+        
+        if titulo_libro:
+            reseñas = reseñas.join(ReseñaModel.fk_libro_reseña).filter(
+            func.lower(LibroModel.titulo).like(f"%{titulo_libro.lower()}%")
+        )
+        
+        if nombre_usuario:
+            reseñas = reseñas.join(UsuarioModel, ReseñaModel.fk_idUser == UsuarioModel.idUser).filter(
+            func.lower(UsuarioModel.user).like(f"%{nombre_usuario.lower()}%")
+            )
 
 
         ### FIN FILTROS ####
@@ -111,14 +131,18 @@ class Reseñas(Resource):
                 'pages': reseñas.pages,
                 'page': page
                 })
-        
+    
+    @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def post(self):
         reseña = ReseñaModel.from_json(request.get_json())
         db.session.add(reseña)
         db.session.commit()
         print(reseña)
-        return reseña.to_json()
+        return {
+            "message": "Reseña creada exitosamente.",
+            "reseña": reseña.to_json()
+        }, 201
     
 if __name__ == '__main__':
     pass

@@ -15,6 +15,8 @@ import { ReviewComponent } from './pages/review/review.component';
 import { CatalogoComponent } from './pages/catalogo/catalogo.component';
 import { authSessionGuard } from './guards/auth-session.guard';
 import { adminSessionGuard } from './guards/admin-session.guard';
+import { DetallesLibroComponent } from './pages/detalles-libro/detalles-libro.component';
+import { AutorComponent } from './pages/autor/autor.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -30,6 +32,8 @@ const routes: Routes = [
   { path: 'users', component: UsersComponent, canActivate:[adminSessionGuard]},
   { path: 'review', component: ReviewComponent, canActivate:[authSessionGuard]},
   { path: 'catalogo', component: CatalogoComponent, canActivate:[adminSessionGuard]},
+  { path: 'autor', component: AutorComponent, canActivate: [adminSessionGuard]},
+  { path: 'libro/:id', component: DetallesLibroComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full'},
   
 ];

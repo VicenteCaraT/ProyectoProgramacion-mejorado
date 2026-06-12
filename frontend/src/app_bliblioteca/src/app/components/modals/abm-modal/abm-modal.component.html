@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">{{ formTitle }}</h2>
-<form [formGroup]="formEntity" (ngSubmit)="saveChanges()" class="mat-form">
+<form [formGroup]="formEntity" class="mat-form">
     <mat-dialog-content class="mat-content">
 
         <!-- Formulario para Libros -->
@@ -18,7 +18,7 @@
 
             <mat-form-field class="full-width">
                 <mat-label>Autor</mat-label>
-                <input matInput type="number" formControlName="autor" placeholder="Ingrese el autor">
+                <input matInput type="number" formControlName="autor" placeholder="Ingrese el autor" (keypress)="allowOnlyNumbers($event)">
                 <mat-error *ngIf="formEntity.get('autor')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
 
@@ -43,7 +43,7 @@
             <!-- Este campo solo lo verá un administrador -->
             <mat-form-field *ngIf="isAdmin()" class="full-width">
                 <mat-label>Cantidad</mat-label>
-                <input matInput formControlName="cantidad" type="number" placeholder="Ingrese la cantidad">
+                <input matInput formControlName="cantidad" type="number" placeholder="Ingrese la cantidad" (keypress)="allowOnlyNumbers($event)">
                 <mat-error *ngIf="formEntity.get('cantidad')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
         </div>
@@ -52,13 +52,13 @@
         <div *ngIf="data.formType === 'loan'">
             <mat-form-field class="full-width">
                 <mat-label>Usuario</mat-label>
-                <input matInput type="number" formControlName="usuario" placeholder="Ingrese el id del usuario">
+                <input matInput type="number" formControlName="usuario" placeholder="Ingrese el id del usuario" (keypress)="allowOnlyNumbers($event)">
                 <mat-error *ngIf="formEntity.get('usuario.id')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
             
             <mat-form-field class="full-width">
                 <mat-label>Libro</mat-label>
-                <input matInput type="number" formControlName="libro" placeholder="Ingrese el id del libro">
+                <input matInput type="number" formControlName="libro" placeholder="Ingrese el id del libro" (keypress)="allowOnlyNumbers($event)">
                 <mat-error *ngIf="formEntity.get('libro.id')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
 
@@ -98,7 +98,7 @@
                 <mat-error *ngIf="formEntity.get('user')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
 
-            <mat-form-field class="full-width">
+            <mat-form-field class="full-width" *ngIf="formOperation !== 'edit'">
                 <mat-label>Constraseña</mat-label>
                 <input matInput type="password" formControlName="contraseña" placeholder="Ingrese la contraseña">
                 <mat-error *ngIf="formEntity.get('contraseña')?.invalid">Este campo es requerido.</mat-error>
@@ -106,25 +106,25 @@
 
             <mat-form-field class="full-width">
                 <mat-label>Nombre</mat-label>
-                <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+                <input matInput formControlName="nombre" placeholder="Ingrese el nombre" (keypress)="allowOnlyLetters($event)">
                 <mat-error *ngIf="formEntity.get('nombre')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
 
             <mat-form-field class="full-width">
                 <mat-label>Apellido</mat-label>
-                <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+                <input matInput formControlName="apellido" placeholder="Ingrese el apellido" (keypress)="allowOnlyLetters($event)">
                 <mat-error *ngIf="formEntity.get('apellido')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
 
             <mat-form-field class="full-width">
                 <mat-label>DNI</mat-label>
-                <input matInput formControlName="dni" type="number" placeholder="Ingrese el DNI">
+                <input matInput formControlName="dni" type="number" placeholder="Ingrese el DNI" (keypress)="allowOnlyNumbers($event)">
                 <mat-error *ngIf="formEntity.get('dni')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
 
             <mat-form-field class="full-width">
                 <mat-label>Teléfono</mat-label>
-                <input matInput formControlName="telefono" type="tel" placeholder="Ingrese el teléfono">
+                <input matInput formControlName="telefono" type="tel" placeholder="Ingrese el teléfono" (keypress)="allowOnlyNumbers($event)">
                 <mat-error *ngIf="formEntity.get('telefono')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
 
@@ -149,10 +149,54 @@
             <mat-form-field class="full-width">
                 <mat-label>Estado</mat-label>
                     <mat-select formControlName="estado" placeholder="Seleccione el estado">
-                        <mat-option [value]="true">Desbloqueado</mat-option>
-                        <mat-option [value]="false">Bloqueado</mat-option>
+                        <mat-option [value]="false">Desbloqueado</mat-option>
+                        <mat-option [value]="true">Bloqueado</mat-option>
                     </mat-select>
                 <mat-error *ngIf="formEntity.get('estado')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+        </div>
+        <!--Formulario para reseñas-->
+        <div *ngIf="data.formType === 'review'">
+            <mat-form-field class="full-width">
+                <mat-label>Usuario</mat-label>
+                <input matInput type="number" formControlName="usuario" placeholder="Ingrese el id del usuario">
+                <mat-error *ngIf="formEntity.get('usuario')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+            
+            <mat-form-field class="full-width">
+                <mat-label>Libro</mat-label>
+                <input matInput type="number" formControlName="libro" placeholder="Ingrese el id del libro">
+                <mat-error *ngIf="formEntity.get('libro')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+                <mat-label>Descripcion</mat-label>
+                <textarea matInput formControlName="descripcion" placeholder="Ingrese la descripcion"></textarea>
+                <mat-error *ngIf="formEntity.get('descripcion')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+                <mat-label>Valoración</mat-label>
+                <input matInput type="number" formControlName="valoracionNum" min="1" max="5" placeholder="1 a 5" (keypress)="allowOnlyNumbers($event)">
+                <mat-error *ngIf="formEntity.get('valoracionNum')?.invalid">Debe ser un número del 1 al 5.</mat-error>
+            </mat-form-field>
+        </div>
+            <!-- Formulario para Autores -->
+        <div *ngIf="data.formType === 'autor'">
+            <mat-form-field class="full-width">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="nombre" placeholder="Ingrese el nombre" (keypress)="allowOnlyLetters($event)">
+                <mat-error *ngIf="formEntity.get('nombre')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+                <mat-label>Apellido</mat-label>
+                <input matInput formControlName="apellido" placeholder="Ingrese el apellido" (keypress)="allowOnlyLetters($event)">
+                <mat-error *ngIf="formEntity.get('apellido')?.invalid">Este campo es requerido.</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+                <mat-label>Apodo</mat-label>
+                <input matInput formControlName="apodo" placeholder="Ingrese el apellido">
+                <mat-error *ngIf="formEntity.get('apodo')?.invalid">Este campo es requerido.</mat-error>
             </mat-form-field>
         </div>
     </mat-dialog-content>

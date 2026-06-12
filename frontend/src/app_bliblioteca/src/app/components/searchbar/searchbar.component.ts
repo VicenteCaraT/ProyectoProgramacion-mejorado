@@ -11,7 +11,7 @@ export class SearchbarComponent implements OnChanges{
   @Input() currentPage: string = '';
   searchQuery: string = '';
   @Output() filterChange = new EventEmitter<{ type: string, value: string }>();
-  filterOptions: Array<{ value: string, label: string }> = [];
+  filterOptions: Array<{ type?:string, value: string, label: string}> = [];
 
   constructor (
     private location: Location,
@@ -46,38 +46,46 @@ export class SearchbarComponent implements OnChanges{
       case 'catalogo':
         this.filterOptions = [
           clearFilterOption,
-          {value: 'user', label: 'Usuarios'},
-          {value: 'book', label: 'Libros'},
-          {value: 'status', label: 'Estado'}
+          { type: 'orden', value: 'mayor_stock', label: 'Mayor stock' },
+          { type: 'sin_stock', value: 'true', label: 'Sin stock' },
+          { type: 'orden', value: 'ranking', label: 'Ranking' },
         ];
         break;
       case 'prestamo':
         this.filterOptions = [
           clearFilterOption,
-          { value: 'Pendiente', label: 'Pendiente' },
-          { value: 'Activo', label: 'Activos' },
-          { value: 'fecha_proxima', label: 'Fechas Proximas' }
+          { type: 'estado', value: 'Pendiente', label: 'Pendiente' },
+          { type: 'estado', value: 'Activo', label: 'Activos' },
+          { type: 'estado', value: 'Terminado', label: 'Terminados' },
+          { type: 'orden', value: 'proximos', label: 'Próximos a Terminar' }
         ];
         break;
         case 'usuarios':
           this.filterOptions = [
             clearFilterOption,
-            { value: 'Pendiente', label: 'Pendiente' },
-            { value: 'Usuario', label: 'Usuarios' },
-            { value: 'Admin', label: 'Administradores' },
-            { value: 'Bibliotecario', label: 'Bibliotecarios' },
-            { value: '0', label: 'Desbloqueado' },
-            { value: '1', label: 'Bloqueado' }
+            { type: 'rol', value: 'Pendiente', label: 'Pendiente' },
+            { type: 'rol', value: 'Usuario', label: 'Usuarios' },
+            { type: 'rol', value: 'Admin', label: 'Administradores' },
+            { type: 'rol', value: 'Bibliotecario', label: 'Bibliotecarios' },
+            { type: 'estado', value: '0', label: 'Desbloqueado' },
+            { type: 'estado', value: '1', label: 'Bloqueado' }
           ];
           break;
+        case 'reseñas':
+          this.filterOptions = [
+            clearFilterOption,
+            { type: 'ordenValoracion', value: 'Valoraciones_desc', label: 'Reseñas + a -' },
+            { type: 'ordenValoracion', value: 'Valoraciones_asc', label: 'Reseñas - a +' },
+          ];
+        break;
       default:
         this.filterOptions = [];
     }
   }
 
-  onFilterChange(type: string, value: string) {
-    console.log('Filter changed:', type, value);
-    this.filterChange.emit({ type, value });
-}
+  onFilterChange(option: { type?: string, value: string }) {
+    console.log('Filter changed:', option);
+    this.filterChange.emit({ type: option.type || '', value: option.value });
+  }
 
 }
