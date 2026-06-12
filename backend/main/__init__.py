@@ -64,5 +64,18 @@ def create_app():
 
     from .logging_config import setup_logging
     setup_logging(app)
+    
+    # Manejador global de errores
+    @app.errorhandler(400)
+    def bad_request(error):
+        return {"message": "Solicitud invalida" , "error": str(error)}, 400
+    
+    @app.errorhandler(404)
+    def not_found(error):
+        return {"message": "Recurso no encontrado"}, 404
+    
+    @app.errorhandler(500)
+    def internal_error(error):
+        return {"message": "Error interno del servidor"}, 500
 
     return app
