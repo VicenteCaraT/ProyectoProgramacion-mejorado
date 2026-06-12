@@ -98,7 +98,7 @@ class Reseñas(Resource):
         #libro del más valorado al menos valorado 
         if reseña_mas_menos == 'Valoraciones_desc':
             reseñas=reseñas.order_by(desc(ReseñaModel.valoracion))
-        if reseña_menos_mas == "Valoraciones_asc":
+        elif reseña_menos_mas == "Valoraciones_asc":
             reseñas=reseñas.order_by(asc(ReseñaModel.valoracion))
         #reseñas por usuario
         if reseña_usuario:

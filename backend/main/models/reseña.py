@@ -29,7 +29,8 @@ class Reseña(db.Model):
             "valoracion" : str(self.valoracion)
         }
         return reseña_json
-        
+    
+    @staticmethod
     def from_json(reseña_json):
         id = reseña_json.get("id")
         usuario = reseña_json.get("usuario")
