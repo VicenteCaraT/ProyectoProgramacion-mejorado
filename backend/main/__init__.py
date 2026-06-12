@@ -29,8 +29,6 @@ def create_app():
     db.init_app(app)
 
     import main.resources as resources
-    api.add_resource(resources.LoginResource, '/login')
-    api.add_resource(resources.SignInResource, '/signin')
     api.add_resource(resources.UsuarioResource, '/usuario/<id>')
     api.add_resource(resources.UsuariosResource, '/usuarios')
     api.add_resource(resources.LibroResource, '/libro/<id>')

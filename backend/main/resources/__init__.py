@@ -1,5 +1,3 @@
-from .login import Login as LoginResource
-from .signIn import SignIn as SignInResource
 from .usuario import Usuario as UsuarioResource
 from .usuario import Usuarios as UsuariosResource
 from .libro import Libro as LibroResource
