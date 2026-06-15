@@ -1,3 +1,5 @@
+from .autor_dto import AutorDTO
+
 class LibroDTO:
     @staticmethod
     def full(libro):
@@ -12,7 +14,7 @@ class LibroDTO:
             "img": libro.book_img,
             "titulo": libro.titulo,
             "cantidad": libro.cantidad,
-            "autor": [a.to_json() for a in libro.fk_idAutor],
+            "autor": [AutorDTO.full(a) for a in libro.fk_idAutor],
             "editorial": libro.editorial,
             "genero": libro.genero,
             "sinopsis": libro.sinopsis,
@@ -26,7 +28,7 @@ class LibroDTO:
             "id": libro.idLibro,
             "img": libro.book_img,
             "titulo": libro.titulo,
-            "autor": [a.to_json_short() for a in libro.fk_idAutor],
+            "autor": [AutorDTO.short(a) for a in libro.fk_idAutor],
             "editorial": libro.editorial,
             "genero": libro.genero,
             "sinopsis": libro.sinopsis

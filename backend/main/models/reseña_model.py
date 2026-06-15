@@ -1,6 +1,5 @@
 from .. import db
 from datetime import datetime
-from . import UsuarioModel, LibroModel
 
 class Reseña(db.Model):
     __tablename__ = "reseñas"
@@ -16,19 +15,6 @@ class Reseña(db.Model):
 
     def __repr__(self):
         return f"<id: {self.idReseña}, Usuario: {self.fk_idUser}, Libro: {self.fk_idLibro}, Fecha: {self.fecha}, Descripcion: {self.descripcion}, Valoracion: {self.valoracion}"
-    
-    def to_json(self):
-        self.fk_user_reseña = db.session.query(UsuarioModel).get_or_404(self.fk_idUser)
-        self.fk_libro_reseña = db.session.query(LibroModel).get_or_404(self.fk_idLibro)
-        reseña_json = {
-            "id" : int(self.idReseña),
-            "usuario" : self.fk_user_reseña.to_json(),
-            "libro" : self.fk_libro_reseña.to_json(),
-            "fecha" : str(self.fecha.strftime("%d-%m-%Y")),
-            "descripcion" : str(self.descripcion),
-            "valoracion" : str(self.valoracion)
-        }
-        return reseña_json
     
     @staticmethod
     def from_json(reseña_json):

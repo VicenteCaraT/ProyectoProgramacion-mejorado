@@ -19,36 +19,6 @@ class Usuario(db.Model):
     reseñas_user = db.relationship("Reseña", back_populates="fk_user_reseña", cascade="all, delete-orphan")
     guardados_user = db.relationship("Guardado", back_populates="fk_user_guardado", cascade="all, delete-orphan")
     
-    def __repr__(self):
-        return (
-            f"<id: {self.idUser}, User: {self.user}, Contraseña: {self.contraseña}, Nombre: {self.nombre},"
-            + f"Apellido: {self.apellido}, DNI: {self.dni}, Telefono: {self.telefono}, Email: {self.email}, Rol: {self.rol}, Profile Img: {self.profile_img}>"
-        )
-    def to_json(self):
-        usuario_json = {
-            "id" : int(self.idUser),
-            "user" : str(self.user),
-            #"contraseña" : str(self.contraseña),
-            "nombre" : str(self.nombre),
-            "apellido" : str(self.apellido),
-            "dni" : int(self.dni),
-            "telefono" : str(self.telefono),
-            "email" : str(self.email),
-            "rol" : str(self.rol),
-            "img" : str(self.profile_img), # ver como manejar las imagenes
-            "estado": str(self.estado)
-        }
-        return usuario_json
-    
-    def to_json_short(self):
-        usuario_json = {
-            "id" : int(self.idUser),
-            "user" : str(self.user),
-            "nombre" : str(self.nombre),
-            "apellido" : str(self.apellido)
-        }
-        return usuario_json
-    
     @property
     def plain_password(self):
         raise AttributeError('Password cant be read')

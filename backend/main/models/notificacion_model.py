@@ -1,5 +1,4 @@
 from .. import db
-from . import UsuarioModel
 
 class Notificacion(db.Model):
     __tablename__ = "notificaciones"
@@ -10,15 +9,6 @@ class Notificacion(db.Model):
 
     def __repr__(self):
         return f"<id: {self.idNotificacion}, Usuario: {self.fk_idUser}, Descripcion: {self.descripcion}"
-    
-    def to_json(self):
-        self.fk_user_notificacion = db.session.query(UsuarioModel).get_or_404(self.fk_idUser)
-        notificacion_json = {
-            "id" : int(self.idNotificacion),
-            "usuario" : self.fk_user_notificacion.to_json(),
-            "descripcion" : str(self.descripcion) 
-        }
-        return notificacion_json
     
     @staticmethod
     def from_json(notificacion_json):

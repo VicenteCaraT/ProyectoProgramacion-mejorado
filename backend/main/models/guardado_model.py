@@ -1,6 +1,4 @@
 from .. import db
-from . import UsuarioModel
-from . import LibroModel
 
 class Guardado(db.Model):
     __tablename__= "guardados"
@@ -13,14 +11,6 @@ class Guardado(db.Model):
     
     def __repr__(self):
         return f"<id: {self.idGuardado}, Usuario: {self.fk_idUser}, Libro: {self.fk_idLibro}"
-    
-    def to_json(self):
-        guardado_json = {
-            "id" : int(self.idGuardado),
-            "usuario": self.fk_user_guardado.to_json(),
-            "libro": self.fk_libro_guardado.to_json()
-        }
-        return guardado_json
     
     @staticmethod
     def from_json(guardado_json):

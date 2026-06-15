@@ -8,24 +8,6 @@ class Autor(db.Model):
     apellido = db.Column(db.String(60), nullable=False)
     apodo = db.Column(db.String(60), nullable=False)
 
-    def __repr__(self):
-        return f"<id: {self.idAutor}, Nombre: {self.nombre}, Apellido: {self.apellido}, Apodo: {self.apodo}>"
-    
-    def to_json(self):
-        autor_json = {
-            "id" : int(self.idAutor),
-            "nombre" : str(self.nombre),
-            "apellido" : str(self.apellido),
-            "apodo" : str(self.apodo)
-        }
-        return autor_json
-    
-    def to_json_short(self):
-        autor_json= {
-            "apodo" : str(self.apodo)
-        }
-        return autor_json
-    
     @staticmethod
     def from_json(autor_json):
         id = autor_json.get("id")

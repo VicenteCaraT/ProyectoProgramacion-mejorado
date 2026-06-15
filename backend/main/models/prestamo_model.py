@@ -1,6 +1,5 @@
 from .. import db
 from datetime import datetime
-from . import UsuarioModel
 
 prestamos_libros = db.Table("prestamos_libros", 
     db.Column("id_libro", db.Integer, db.ForeignKey("libros.idLibro"), primary_key=True),
@@ -19,18 +18,6 @@ class Prestamo(db.Model):
 
     def __repr__(self):
         return f"<id: {self.idPrestamo}, Usuario: {self.fk_idUser}, Libro: {self.fk_idLibro}, Inicio_Prestamo: {self.inicio_prestamo}, Fin_Prestamo: {self.fin_prestamo}, Estado: {self.estado}"
-    
-    def to_json(self):
-        self.fk_user_prestamo = db.session.query(UsuarioModel).get_or_404(self.fk_idUser)
-        prestamo_json = {
-            "id" : int(self.idPrestamo),
-            "usuario" : self.fk_user_prestamo.to_json(),
-            "libro" : [libro.to_json() for libro in self.fk_idLibro],
-            "inicio_prestamo" : str(self.inicio_prestamo.strftime("%d-%m-%Y")),
-            "fin_prestamo" : str(self.fin_prestamo.strftime("%d-%m-%Y")),
-            "estado" : str(self.estado)
-        }
-        return prestamo_json
     
     @staticmethod
     def from_json(prestamo_json):
