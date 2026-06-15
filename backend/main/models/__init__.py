@@ -1,7 +1,7 @@
-from .libro import Libro as LibroModel
-from .usuario import Usuario as UsuarioModel
-from .notificacion import Notificacion as NotificacionModel
-from .autor import Autor as AutorModel
-from .prestamo import Prestamo as PrestamoModel
-from .reseña import Reseña as ReseñaModel
-from .guardado import Guardado as GuardadoModel
+from .libro_model import Libro as LibroModel
+from .usuario_model import Usuario as UsuarioModel
+from .notificacion_model import Notificacion as NotificacionModel
+from .autor_model import Autor as AutorModel
+from .prestamo_model import Prestamo as PrestamoModel
+from .reseña_model import Reseña as ReseñaModel
+from .guardado_model import Guardado as GuardadoModel

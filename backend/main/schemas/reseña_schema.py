@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.reseña import Reseña
+from main.models.reseña_model import Reseña
 
 class ReseñaSchema(SQLAlchemyAutoSchema):
     class Meta:

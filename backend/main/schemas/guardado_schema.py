@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.guardado import Guardado
+from main.models.guardado_model import Guardado
 
 class GuardadoSchema(SQLAlchemyAutoSchema):
     class Meta:

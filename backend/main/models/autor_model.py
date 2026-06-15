@@ -1,5 +1,5 @@
 from .. import db
-from .libro import libros_autores
+from .libro_model import libros_autores
 
 class Autor(db.Model):
     __tablename__ = "autores"

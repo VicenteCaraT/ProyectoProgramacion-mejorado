@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.libro import Libro
+from main.models.libro_model import Libro
 
 class LibroSchema(SQLAlchemyAutoSchema):
     class Meta:

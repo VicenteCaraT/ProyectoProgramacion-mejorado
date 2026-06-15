@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.autor import Autor
+from main.models.autor_model import Autor
 
 class AutorSchema(SQLAlchemyAutoSchema):
     class Meta:

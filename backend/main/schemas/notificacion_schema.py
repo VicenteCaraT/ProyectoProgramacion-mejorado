@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.notificacion import Notificacion
+from main.models.notificacion_model import Notificacion
 
 class NotificacionSchema(SQLAlchemyAutoSchema):
     class Meta:
