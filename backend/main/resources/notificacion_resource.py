@@ -4,7 +4,6 @@ from main.auth.decorators import role_required, handle_errors
 from main.services import NotificacionService
 from main.dtos import NotificacionDTO
 
-#implementar envio de mail
 
 class Notificacion(Resource):
     

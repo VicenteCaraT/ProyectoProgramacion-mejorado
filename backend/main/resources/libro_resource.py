@@ -7,8 +7,6 @@ from main.dtos import LibroDTO
 
 class Libro(Resource):
     
-    # Cambiado el jwt ya que un usuario sin rol puede ingresar al home
-    #@jwt_required(optional=True)
     @handle_errors
     def get(self, id):
         libro = LibroService.get_by_id(id)

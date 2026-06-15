@@ -5,7 +5,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from main.services import ReseñaService
 from main.dtos import ReseñaDTO
 
-#implementar envio de mail
 
 class Reseña(Resource):
     
@@ -17,7 +16,6 @@ class Reseña(Resource):
     
     @handle_errors
     @role_required(roles=["Usuario", "Admin"])
-    # el usuario se puede modificar, solo a si mismo
     def put(self, id):
         reseña = ReseñaService.get_by_id(id)
         current_user_id = get_jwt_identity()
@@ -28,8 +26,6 @@ class Reseña(Resource):
                 
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
-    # el usuario puede borrar la reseña, solo a si mismo
-    # el admin o bibliotecario puede borrar cualquiera
     def delete(self, id):
         current_user_id = get_jwt_identity()
         reseña = ReseñaService.get_by_id(id)
@@ -39,7 +35,6 @@ class Reseña(Resource):
         return '', 204
         
 class Reseñas(Resource):
-    # cambiado jwt ya que un usuario sin rol puede ingresar al home y ver libros
     # @jwt_required(optional=True)
     @handle_errors
     def get(self):

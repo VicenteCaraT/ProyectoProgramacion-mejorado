@@ -6,14 +6,11 @@ from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 from main.services import PrestamoService
 from main.dtos import PrestamoDTO
 
-#implementar envio de mail
 
 class Prestamo(Resource):
     
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
-    # solo el usuario puede ver los prestamos de uno mismo
-    # el admin y bibliotecario puede ver cualquiera
     def get(self, id):
         prestamo = PrestamoService.get_by_id(id)
         return PrestamoDTO.full(prestamo, prestamo.fk_user_prestamo, prestamo.fk_idLibro)

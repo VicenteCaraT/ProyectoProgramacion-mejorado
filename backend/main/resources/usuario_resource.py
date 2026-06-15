@@ -6,7 +6,7 @@ from main.services import UsuarioService
 from main.dtos import UsuarioDTO
 
 
-class Usuario(Resource): #arreglado
+class Usuario(Resource):
     
     @handle_errors
     @jwt_required(optional=True)
@@ -29,8 +29,6 @@ class Usuario(Resource): #arreglado
     @handle_errors
     @role_required(roles = ["Admin", "Usuario"])
     def delete(self, id):
-        #el usuario puede borrarse solo a sí mismo pero un borrado lógico
-        #el admin o bibliotecario puede borrar a cualquier usuario
         current_user_id = get_jwt_identity()
         usuario = UsuarioService.get_by_id(id)
         if int(current_user_id) != int(usuario.idUser) and "Admin" not in get_jwt().get('rol', []):
