@@ -1,4 +1,4 @@
-from main.repositories import GuardadoRepository
+from main.repositories import GuardadoRepository, UsuarioRepository, LibroRepository
 from main.models import GuardadoModel
 
 class GuardadoService:
@@ -16,6 +16,10 @@ class GuardadoService:
 
     @staticmethod
     def create(user_id, libro_id):
+        if UsuarioRepository.get_by_id(user_id) is None:
+            raise ValueError(f"El usuario ID {user_id} no existe")
+        if LibroRepository.get_by_id(libro_id) is None:
+            raise ValueError(f"El libro ID {libro_id} no existe")
         existente = GuardadoRepository.get_all(filters={
             "idUsuario": user_id, "libro_id": libro_id
         })

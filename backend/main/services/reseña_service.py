@@ -1,5 +1,5 @@
-from main.repositories import ReseñaRepository
-from main.models import ReseñaModel, UsuarioModel, LibroModel
+from main.repositories import ReseñaRepository, UsuarioRepository, LibroRepository
+from main.models import ReseñaModel
 
 class ReseñaService:
     @staticmethod
@@ -16,6 +16,12 @@ class ReseñaService:
 
     @staticmethod
     def create(data):
+        user_id = data.get("usuario")
+        libro_id = data.get("libro")
+        if UsuarioRepository.get_by_id(user_id) is None:
+            raise ValueError(f"El usuario ID {user_id} no existe")
+        if LibroRepository.get_by_id(libro_id) is None:
+            raise ValueError(f"El libro ID {libro_id} no existe")
         reseña = ReseñaModel.from_json(data)
         return ReseñaRepository.save(reseña)
 

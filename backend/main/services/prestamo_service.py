@@ -1,4 +1,4 @@
-from main.repositories import PrestamoRepository, LibroRepository
+from main.repositories import PrestamoRepository, LibroRepository, UsuarioRepository
 from main.models import PrestamoModel
 from .. import db
 from datetime import datetime, timedelta
@@ -19,15 +19,21 @@ class PrestamoService:
     @staticmethod
     def create(data):
         user_id = data.get("usuario")
+        if UsuarioRepository.get_by_id(user_id) is None:
+            raise ValueError(f"El usuario ID {user_id} no existe")
+
         libro_ids = data.get("libro")
         if not isinstance(libro_ids, list):
             libro_ids = [libro_ids]
 
-        libros = [LibroRepository.get_by_id(lib_id) for lib_id in libro_ids]
-
-        for libro in libros:
+        libros = []
+        for lib_id in libro_ids:
+            libro = LibroRepository.get_by_id(lib_id)
+            if libro is None:
+                raise ValueError(f"El libro ID {lib_id} no existe")
             if libro.cantidad <= 0:
                 raise ValueError(f"Sin stock para el libro ID {libro.idLibro}")
+            libros.append(libro)
 
         if "inicio_prestamo" not in data or "fin_prestamo" not in data:
             hoy = datetime.today()
@@ -63,7 +69,12 @@ class PrestamoService:
             ids_libros = data["libro"]
             if isinstance(ids_libros, int):
                 ids_libros = [ids_libros]
-            nuevos = [LibroRepository.get_by_id(lib_id) for lib_id in ids_libros]
+            nuevos = []
+            for lib_id in ids_libros:
+                libro = LibroRepository.get_by_id(lib_id)
+                if libro is None:
+                    raise ValueError(f"El libro ID {lib_id} no existe")
+                nuevos.append(libro)
             prestamo.fk_idLibro = nuevos
         return PrestamoRepository.save(prestamo)
 

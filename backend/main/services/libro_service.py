@@ -21,7 +21,12 @@ class LibroService:
         if autor_ids:
             if not isinstance(autor_ids, list):
                 autor_ids = [autor_ids]
-            autores = AutorRepository.get_all(filters={"idAutor": autor_ids})
+            autores = []
+            for aid in autor_ids:
+                autor = AutorRepository.get_by_id(aid)
+                if autor is None:
+                    raise ValueError(f"El autor ID {aid} no existe")
+                autores.append(autor)
             libro.fk_idAutor.extend(autores)
         return LibroRepository.save(libro)
 
@@ -33,8 +38,15 @@ class LibroService:
             if key != "autor":
                 setattr(libro, key, value)
         if autor_ids:
-            nuevo_autor = AutorRepository.get_by_id(autor_ids)
-            libro.fk_idAutor = [nuevo_autor]
+            if not isinstance(autor_ids, list):
+                autor_ids = [autor_ids]
+            autores = []
+            for aid in autor_ids:
+                autor = AutorRepository.get_by_id(aid)
+                if autor is None:
+                    raise ValueError(f"El autor ID {aid} no existe")
+                autores.append(autor)
+            libro.fk_idAutor = autores
         return LibroRepository.save(libro)
 
     @staticmethod

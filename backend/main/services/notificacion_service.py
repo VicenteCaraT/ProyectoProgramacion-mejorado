@@ -1,4 +1,4 @@
-from main.repositories import NotificacionRepository
+from main.repositories import NotificacionRepository, UsuarioRepository
 from main.models import NotificacionModel
 
 class NotificacionService:
@@ -16,6 +16,9 @@ class NotificacionService:
 
     @staticmethod
     def create(data):
+        user_id = data.get("usuario")
+        if UsuarioRepository.get_by_id(user_id) is None:
+            raise ValueError(f"El usuario ID {user_id} no existe")
         notificacion = NotificacionModel.from_json(data)
         return NotificacionRepository.save(notificacion)
 
