@@ -1,12 +1,9 @@
 from flask_restful import Resource
 from flask import request, jsonify
-from .. import db
-from main.models import ReseñaModel, UsuarioModel, LibroModel
-import regex
-from datetime import datetime
-from sqlalchemy import func, desc, asc
 from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from main.services import ReseñaService
+from main.dtos import ReseñaDTO
 
 #implementar envio de mail
 
@@ -15,135 +12,61 @@ class Reseña(Resource):
     @handle_errors
     @jwt_required(optional=True)
     def get(self, id):
-        reseña = db.session.query(ReseñaModel).get_or_404(id)
-        return reseña.to_json()
+        reseña = ReseñaService.get_by_id(id)
+        return ReseñaDTO.full(reseña, reseña.fk_user_reseña, reseña.fk_libro_reseña)
     
     @handle_errors
     @role_required(roles=["Usuario", "Admin"])
     # el usuario se puede modificar, solo a si mismo
     def put(self, id):
-        reseña = db.session.query(ReseñaModel).get_or_404(id)
-        data = request.get_json()
+        reseña = ReseñaService.get_by_id(id)
         current_user_id = get_jwt_identity()
         if int(current_user_id) != int(reseña.fk_idUser) and "Admin" not in get_jwt().get('rol', []):
-            return {'message' : 'No tienes permiso para modificar la reseña de este usuario'}
-        nuevo_usuario_id = data.get('usuario')
-        
-        if nuevo_usuario_id:
-            nuevo_usuario = UsuarioModel.query.get_or_404(nuevo_usuario_id)
-            reseña.fk_user_reseña = nuevo_usuario
-        nuevo_libro_id = data.get('libro')
-        if nuevo_libro_id:
-            nuevo_libro = LibroModel.query.get_or_404(nuevo_libro_id)
-            reseña.fk_libro_reseña = nuevo_libro
-            
-        for key, value in data.items():
-            if key not in ['usuario', 'libro']:
-                if regex.match(r"(0?[1-9]|[12][0-9]|3[01])(-)(0?[1-9]|1[012])\2(\d{4})", str(value)):
-                    setattr(reseña, key, datetime.strptime(value, "%d-%m-%Y"))
-                else:
-                    setattr(reseña, key, value)
-
-        db.session.add(reseña)
-        db.session.commit()
-        return {
-            "message": f"Reseña con ID {id} actualizada correctamente.",
-            "reseña": reseña.to_json()
-        }, 200
-        
+            return {"message": "No tiene permiso para modificar la reseña de este usuario"}
+        reseña = ReseñaService.update(id, request.get_json())
+        return {"message": f"Reseña con ID {id} actualizada correctamente.", "reseña": ReseñaDTO.full(reseña, reseña.fk_user_reseña, reseña.fk_libro_reseña)}, 200
+                
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     # el usuario puede borrar la reseña, solo a si mismo
     # el admin o bibliotecario puede borrar cualquiera
     def delete(self, id):
         current_user_id = get_jwt_identity()
-        reseña = db.session.query(ReseñaModel).get_or_404(id)
-        # Verificar permisos
-        if int(current_user_id) != int(reseña.fk_idUser) and "Admin" not in get_jwt().get('rol', []): #cambiado reles por rol
-            return {'message': 'No tiene permisos para borrar esta reseña'}, 403
-        db.session.delete(reseña)
-        db.session.commit()
+        reseña = ReseñaService.get_by_id(id)
+        if int(current_user_id) != int(reseña.fk_idUser) and "Admin" not in get_jwt().get('rol', []):
+            return {"message": "No tiene permisos para borrar esta reseña"}, 403
+        ReseñaService.delete(id)
         return '', 204
-
+        
 class Reseñas(Resource):
     # cambiado jwt ya que un usuario sin rol puede ingresar al home y ver libros
     # @jwt_required(optional=True)
     @handle_errors
     def get(self):
-        page = 1
-        per_page = 10
-        
-        reseñas = db.session.query(ReseñaModel)
-        
-        if request.args.get('page'):
-            page = int(request.args.get('page'))
-        if request.args.get('per_page'):
-            per_page = int(request.args.get('per_page'))
-        
-        ### FILTROS ###
-        
-        reseña_n_5 = request.args.get('nroValoracion')
-        reseña_mas_menos = request.args.get('ordenValoracion')
-        reseña_menos_mas = request.args.get('ordenValoracion')
-        reseña_usuario = request.args.get('idUserPost')
-        reseña_x_fecha = request.args.get('fechaReseña')
-        reseña_libro = request.args.get('idLibro')
-        nombre_usuario = request.args.get('nombre_usuario')
-        titulo_libro = request.args.get('titulo_libro')
-
-        #reseñas n/5
-        if request.args.get("nroValoracion"):
-            reseñas=reseñas.filter(ReseñaModel.valoracion.like("%"+reseña_n_5+"%"))
-
-        #libro del más valorado al menos valorado 
-        if reseña_mas_menos == 'Valoraciones_desc':
-            reseñas=reseñas.order_by(desc(ReseñaModel.valoracion))
-        elif reseña_menos_mas == "Valoraciones_asc":
-            reseñas=reseñas.order_by(asc(ReseñaModel.valoracion))
-        #reseñas por usuario
-        if reseña_usuario:
-            reseñas=reseñas.filter(ReseñaModel.fk_idUser == reseña_usuario)
-        #reseña por fecha
-        if reseña_x_fecha:
-            reseña_x_fecha = datetime.strptime(reseña_x_fecha, '%d-%m-%Y')
-            reseñas=reseñas.filter(ReseñaModel.fecha == reseña_x_fecha)
-        # Reseñas por libro
-        if reseña_libro:
-            reseñas = reseñas.filter(ReseñaModel.fk_idLibro == reseña_libro)
-        
-        if titulo_libro:
-            reseñas = reseñas.join(ReseñaModel.fk_libro_reseña).filter(
-            func.lower(LibroModel.titulo).like(f"%{titulo_libro.lower()}%")
-        )
-        
-        if nombre_usuario:
-            reseñas = reseñas.join(UsuarioModel, ReseñaModel.fk_idUser == UsuarioModel.idUser).filter(
-            func.lower(UsuarioModel.user).like(f"%{nombre_usuario.lower()}%")
-            )
-
-
-        ### FIN FILTROS ####
-        
-        reseñas = reseñas.paginate(page=page, per_page=per_page, error_out=True)
-
-        return jsonify({'reseñas': [reseña.to_json() for reseña in reseñas],
-                'total': reseñas.total,
-                'pages': reseñas.pages,
-                'page': page
-                })
-    
+        filters = {
+            "page": int(request.args.get("page", 1)),
+            "per_page": int(request.args.get("per_page", 10)),
+            "nroValoracion": request.args.get("nroValoracion"),
+            "ordenValoracion": request.args.get("ordenValoracion"),
+            "idUserPost": request.args.get("idUserPost"),
+            "fechaReseña": request.args.get("fechaReseña"),
+            "idLibro": request.args.get("idLibro"),
+            "nombre_usuario": request.args.get("nombre_usuario"),
+            "titulo_libro": request.args.get("titulo_libro"),
+        }
+        filters = {k: v for k, v in filters.items() if v is not None}
+        result = ReseñaService.get_all(filters)
+        return jsonify({
+            'reseñas': [ReseñaDTO.full(r, r.fk_user_reseña, r.fk_libro_reseña) for r in result.items],
+            'total': result.total,
+            'pages': result.pages,
+            'page': int(request.args.get("page", 1))
+        })
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def post(self):
-        reseña = ReseñaModel.from_json(request.get_json())
-        db.session.add(reseña)
-        db.session.commit()
-        from flask import current_app
-        current_app.logger.info(f"Reseña creada: {reseña}")
-        return {
-            "message": "Reseña creada exitosamente.",
-            "reseña": reseña.to_json()
-        }, 201
+        reseña = ReseñaService.create(request.get_json())
+        return {"message": "Reseña creada exitosamente.", "reseña": ReseñaDTO.full(reseña, reseña.fk_user_reseña, reseña.fk_libro_reseña)}, 201
     
 if __name__ == '__main__':
     pass
