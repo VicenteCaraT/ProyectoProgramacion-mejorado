@@ -22,8 +22,8 @@ def role_required(roles):
 
 @jwt.user_identity_loader
 def user_identity_lookup(usuario):
-    #Definir ID como atributo identificatorio
-    return usuario.idUser
+    #Definir ID como atributo identificatorio (string requerido por PyJWT)
+    return str(usuario.idUser)
 
 #Define que atributos se guardarán dentro del token
 @jwt.additional_claims_loader
@@ -36,11 +36,16 @@ def add_claims_to_access_token(usuario):
     }
     return claims
 
+from werkzeug.exceptions import HTTPException
+from flask_jwt_extended.exceptions import JWTExtendedException
+
 def handle_errors(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
+        except (HTTPException, JWTExtendedException):
+            raise
         except Exception as e:
             return {
                 "message": "Se produjo un error",

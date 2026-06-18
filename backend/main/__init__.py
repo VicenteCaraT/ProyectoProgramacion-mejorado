@@ -7,7 +7,6 @@ from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_cors import CORS
 
-api = Api()
 #se inicializa SQL
 db = SQLAlchemy()
 #Inicializar JWT
@@ -19,7 +18,8 @@ mailsender = Mail()
 def create_app():
     app = Flask(__name__)
     CORS(app, origins=["http://localhost:4200"])
-    load_dotenv() 
+    load_dotenv()
+    api = Api()
     
     #Si no existe el archivo de base de datos crearlo (solo válido si se utiliza SQLite)
     if not os.path.exists(os.getenv('DATABASE_PATH')+os.getenv('DATABASE_NAME')):

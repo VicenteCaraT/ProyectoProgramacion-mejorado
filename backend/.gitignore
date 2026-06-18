@@ -3,6 +3,7 @@
 /lib
 /lib64
 /env
+/venv
 pyvenv.dfg
 pyvenv.cfg
 .env

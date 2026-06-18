@@ -1,5 +1,5 @@
 #boot.sh
-source env/bin/activate
+source venv/bin/activate
 python3 app.py
 
 #permisos
