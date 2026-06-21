@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
 import { Usuario, UsuarioResponse, UsuariosResponse } from '../../models/models';
@@ -14,11 +14,6 @@ export class UsuariosService {
   ) { }
 
   getUsers(page: number, params?: {rol?:string, nombre?:string, dni?:string, telefono?:string, email?:string, estado?: string}) {
-    let auth_token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
     let httpParams = new HttpParams().set('page', page.toString());
 
     if (params) {
@@ -51,43 +46,23 @@ export class UsuariosService {
         httpParams = httpParams.set('estado', params.estado)
       }
     }
-    return this.httpClient.get<UsuariosResponse>(`${this.url}/usuarios`, {headers: headers, params: httpParams}).pipe(first())
+    return this.httpClient.get<UsuariosResponse>(`${this.url}/usuarios`, {params: httpParams}).pipe(first())
   }
 
   getUserById(id: number) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.get<Usuario>(`${this.url}/usuario/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Usuario>(`${this.url}/usuario/${id}`).pipe(first())
   }
 
   postUser(userData:any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.post<UsuarioResponse>(`${this.url}/usuarios`, userData, {headers : headers})
+    return this.httpClient.post<UsuarioResponse>(`${this.url}/usuarios`, userData)
   }
 
   updateUser(id: number, userData: any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.put<UsuarioResponse>(`${this.url}/usuario/${id}`, userData, {headers: headers}).pipe(first())
+    return this.httpClient.put<UsuarioResponse>(`${this.url}/usuario/${id}`, userData).pipe(first())
   }
 
   deleteUser(id: number) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.delete<void>(`${this.url}/usuario/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/usuario/${id}`).pipe(first())
   }
 
 }

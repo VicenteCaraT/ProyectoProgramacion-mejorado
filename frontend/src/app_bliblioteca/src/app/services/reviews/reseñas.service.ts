@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { first } from 'rxjs';
 import { Reseña, ReseñaResponse, ReseñasResponse } from '../../models/models';
@@ -14,11 +14,6 @@ export class ReseñasService {
   ) { }
 
   getReviews(page: number, params?: {nroValoracion?:string, ordenValoracion?:string, idUserPost?:string, fechaReseña?:string, Valoraciones_desc?:string, Valoraciones_asc?:string, idLibro?: string, titulo_libro?:string, nombre_usuario?:string}){
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
     let httpParams = new HttpParams().set('page', page.toString());
 
     if (params) {
@@ -29,11 +24,6 @@ export class ReseñasService {
     if (params) {
       if (params.ordenValoracion) {
         httpParams = httpParams.set('ordenValoracion', params.ordenValoracion)
-      }
-    }
-    if (params) {
-      if (params.idUserPost) {
-        httpParams = httpParams.set('idUserPost', params.idUserPost)
       }
     }
     if (params) {
@@ -67,44 +57,22 @@ export class ReseñasService {
       }
     }
     
-    
-    return this.httpClient.get<ReseñasResponse>(`${this.url}/reseñas`, {headers: headers, params: httpParams}).pipe(first())
+    return this.httpClient.get<ReseñasResponse>(`${this.url}/reseñas`, {params: httpParams}).pipe(first())
   }
 
   getReviewById(id: number) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.get<Reseña>(`${this.url}/reseña/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Reseña>(`${this.url}/reseña/${id}`).pipe(first())
   }
 
   postReview(reviewData:any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.post<ReseñaResponse>(`${this.url}/reseñas`, reviewData, {headers: headers}).pipe(first())
+    return this.httpClient.post<ReseñaResponse>(`${this.url}/reseñas`, reviewData).pipe(first())
   }
 
-
   updateReview(id: number, reviewData: any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.put<ReseñaResponse>(`${this.url}/reseña/${id}`, reviewData, {headers: headers}).pipe(first())
+    return this.httpClient.put<ReseñaResponse>(`${this.url}/reseña/${id}`, reviewData).pipe(first())
   }
 
   deleteReview(id: number) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.delete<void>(`${this.url}/reseña/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/reseña/${id}`).pipe(first())
   }
 }

@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
 import { Libro, LibroResponse, LibrosResponse } from '../../models/models';
@@ -14,11 +14,6 @@ export class LibrosService {
   ) { }
 
   getBooks(page: number, params?: {genero?:string, autor?:string, titulo?:string, editorial?:string, orden?:string, sin_stock?:string}) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
     let httpParams = new HttpParams().set('page', page.toString());
     if (params) {
       if (params.genero) {
@@ -51,42 +46,22 @@ export class LibrosService {
       }
     }
 
-    return this.httpClient.get<LibrosResponse>(`${this.url}/libros`, {headers: headers, params: httpParams})
+    return this.httpClient.get<LibrosResponse>(`${this.url}/libros`, {params: httpParams})
   }
 
   getBooksById(id : number)  {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.get<Libro>(`${this.url}/libro/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Libro>(`${this.url}/libro/${id}`).pipe(first())
   }
 
   postBook(bookData:any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.post<LibroResponse>(`${this.url}/libros`, bookData, {headers: headers}).pipe(first())
+    return this.httpClient.post<LibroResponse>(`${this.url}/libros`, bookData).pipe(first())
   }
 
   updateBook(id: number, bookData: any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.put<LibroResponse>(`${this.url}/libro/${id}`, bookData, {headers: headers}).pipe(first())
+    return this.httpClient.put<LibroResponse>(`${this.url}/libro/${id}`, bookData).pipe(first())
   }
 
   deleteBook(id: number) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.delete<void>(`${this.url}/libro/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/libro/${id}`).pipe(first())
   }
 }

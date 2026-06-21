@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, first } from 'rxjs';
+import { first } from 'rxjs';
 import { Prestamo, PrestamoResponse, PrestamosResponse } from '../../models/models';
 
 @Injectable({
@@ -14,11 +14,6 @@ export class PrestamosService {
   ) { }
 
   getLoans(page: number, params?: {idUsuario?:string, nombre_usuario?:string, inicio_prestamo?:string, fin_prestamo?:string, cant_libros?:string, libro_id?:string, cant_prestamos?:string, estado?:string, orden?:string, titulo_libro?:string}) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
     let httpParams = new HttpParams().set('page', page.toString());
 
     if (params) {
@@ -80,53 +75,28 @@ export class PrestamosService {
         httpParams = httpParams.set('orden', params.orden)
       }
     }
-    return this.httpClient.get<PrestamosResponse>(`${this.url}/prestamos`, {headers: headers, params:httpParams}).pipe(first())
+    return this.httpClient.get<PrestamosResponse>(`${this.url}/prestamos`, {params:httpParams}).pipe(first())
   }
 
   getLoanById(id: number) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.get<Prestamo>(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Prestamo>(`${this.url}/prestamo/${id}`).pipe(first())
   } 
 
   postLoan(loanData:any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.post<PrestamoResponse>(`${this.url}/prestamos`, loanData, {headers: headers}).pipe(first())
+    return this.httpClient.post<PrestamoResponse>(`${this.url}/prestamos`, loanData).pipe(first())
   }
 
   updateLoan(id: number, loanData: any) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.put<PrestamoResponse>(`${this.url}/prestamo/${id}`, loanData, {headers: headers}).pipe(first())
+    return this.httpClient.put<PrestamoResponse>(`${this.url}/prestamo/${id}`, loanData).pipe(first())
   }
 
   deleteLoan(id: number) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.delete<void>(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/prestamo/${id}`).pipe(first())
   }
 
   patchLoans() {
-  let auth_token = localStorage.getItem('token');
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${auth_token}`
-  });
   return this.httpClient
-    .patch<{message: string}>(`${this.url}/prestamos`, {}, { headers: headers })
+    .patch<{message: string}>(`${this.url}/prestamos`, {})
     .pipe(first());
 }
 }

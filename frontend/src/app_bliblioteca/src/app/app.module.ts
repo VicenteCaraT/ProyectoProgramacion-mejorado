@@ -6,7 +6,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -46,6 +46,7 @@ import { RegisterModalComponent } from './components/modals/register-modal/regis
 import { RatingComponent } from './components/rating/rating.component';
 import { SaveIconComponent } from './components/save-icon/save-icon.component';
 import { AutorComponent } from './pages/autor/autor.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 
 @NgModule({
@@ -100,7 +101,8 @@ import { AutorComponent } from './pages/autor/autor.component';
     MatSnackBarModule
   ],
   providers: [
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
