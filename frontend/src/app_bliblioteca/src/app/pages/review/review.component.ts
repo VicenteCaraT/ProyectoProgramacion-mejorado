@@ -4,6 +4,7 @@ import { SysNotificationService } from '../../services/sys-notifications/sys-not
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
+import { Reseña, ReseñasResponse } from '../../models/models';
 
 @Component({
   selector: 'app-review',
@@ -19,8 +20,8 @@ export class ReviewComponent implements OnInit{
     private dialog: MatDialog
   ) {}
 
-  reviewList: any[] = [];
-  filteredReviews: any[] = [];
+  reviewList: Reseña[] = [];
+  filteredReviews: Reseña[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
 
@@ -39,7 +40,7 @@ export class ReviewComponent implements OnInit{
 
   fetchReviews(page: number, extraParams: any = {}): void {
     const params = {...this.baseParams, ...extraParams}
-    this.reviewService.getReviews(page, params).subscribe((rta: any) => {
+    this.reviewService.getReviews(page, params).subscribe((rta: ReseñasResponse) => {
       console.log('Reseñas API: ', rta);
       this.reviewList = rta.reseñas || [];
       this.filteredReviews = [...this.reviewList];
@@ -113,13 +114,13 @@ export class ReviewComponent implements OnInit{
         { nombre_usuario: query }
       ];
 
-      const allResults: any[] = [];
+      const allResults: Reseña[] = [];
       const seenIds = new Set<number>();
       let pending = paramsList.length;
 
       for ( const params of paramsList) {
         this.reviewService.getReviews(1, params).subscribe(
-          (response: any) => {
+          (response: ReseñasResponse) => {
             if (response && response.reseñas) {
               for (const reseña of response.reseñas) {
                 if(!seenIds.has(reseña.id)) {

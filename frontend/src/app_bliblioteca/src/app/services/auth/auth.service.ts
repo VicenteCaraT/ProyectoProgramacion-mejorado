@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, take } from 'rxjs';
+import { LoginRequest, LoginResponse } from '../../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class AuthService {
     private router: Router
   ) { }
 
-  login(dataLogin: any) : Observable<any> {
-    return this.httpClient.post(this.url + '/auth/login', dataLogin).pipe(take(1))
+  login(dataLogin: LoginRequest) : Observable<LoginResponse> {
+    return this.httpClient.post<LoginResponse>(this.url + '/auth/login', dataLogin).pipe(take(1))
   }
 
   logout() {

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
 import { Router } from '@angular/router';
+import { Libro, LibrosResponse } from '../../models/models';
 
 @Component({
   selector: 'app-search',
@@ -9,12 +10,12 @@ import { Router } from '@angular/router';
 })
 export class SearchComponent {
   showDropdown: boolean = false;
-  searchResults: any[] = [];
+  searchResults: Libro[] = [];
 
   constructor(private bookService: LibrosService, private router: Router) {}
 
-  goToBook(bookID: string) {
-    this.router.navigate(['/libro', bookID])
+  goToBook(bookID: number) {
+    this.router.navigate(['/libro', String(bookID)])
   }
 
   handleSearch(query: string) {
@@ -28,13 +29,13 @@ export class SearchComponent {
         { editorial: query }
       ];
 
-      const allResults: any[] = [];
+      const allResults: Libro[] = [];
       const seenIds = new Set();
       let pending = paramsList.length;
 
       for (const params of paramsList) {
         this.bookService.getBooks(1, params).subscribe(
-          (response: any) => {
+          (response: LibrosResponse) => {
             if (response && response.libros) {
               for (const libro of response.libros) {
                 if (!seenIds.has(libro.id)) {
@@ -68,7 +69,7 @@ export class SearchComponent {
 
   filterByGenre(genero: string) {
   this.bookService.getBooks(1, { genero }).subscribe(
-    (response: any) => {
+    (response: LibrosResponse) => {
       this.searchResults = response.libros || [];
       this.showDropdown = this.searchResults.length > 0;
     },
@@ -82,7 +83,7 @@ export class SearchComponent {
 
 filterByAuthor(autor: string) {
   this.bookService.getBooks(1, { autor }).subscribe(
-    (response: any) => {
+    (response: LibrosResponse) => {
       this.searchResults = response.libros || [];
       this.showDropdown = this.searchResults.length > 0;
     },

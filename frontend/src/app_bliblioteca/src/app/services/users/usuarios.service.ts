@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
+import { Usuario, UsuarioResponse, UsuariosResponse } from '../../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -50,7 +51,7 @@ export class UsuariosService {
         httpParams = httpParams.set('estado', params.estado)
       }
     }
-    return this.httpClient.get(`${this.url}/usuarios`, {headers: headers, params: httpParams}).pipe(first())
+    return this.httpClient.get<UsuariosResponse>(`${this.url}/usuarios`, {headers: headers, params: httpParams}).pipe(first())
   }
 
   getUserById(id: number) {
@@ -59,7 +60,7 @@ export class UsuariosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.get(`${this.url}/usuario/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Usuario>(`${this.url}/usuario/${id}`, {headers: headers}).pipe(first())
   }
 
   postUser(userData:any) {
@@ -68,8 +69,7 @@ export class UsuariosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(userData)
-    return this.httpClient.post(`${this.url}/usuarios`, userData, {headers : headers})
+    return this.httpClient.post<UsuarioResponse>(`${this.url}/usuarios`, userData, {headers : headers})
   }
 
   updateUser(id: number, userData: any) {
@@ -78,8 +78,7 @@ export class UsuariosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(userData)
-    return this.httpClient.put(`${this.url}/usuario/${id}`, userData, {headers: headers}).pipe(first())
+    return this.httpClient.put<UsuarioResponse>(`${this.url}/usuario/${id}`, userData, {headers: headers}).pipe(first())
   }
 
   deleteUser(id: number) {
@@ -88,7 +87,7 @@ export class UsuariosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.delete(`${this.url}/usuario/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/usuario/${id}`, {headers: headers}).pipe(first())
   }
 
 }

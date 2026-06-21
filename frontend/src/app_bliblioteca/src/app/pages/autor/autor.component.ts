@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AutorService } from '../../services/autor/autor.service';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { Autor, AutoresResponse } from '../../models/models';
 
 @Component({
   selector: 'app-autor',
@@ -17,8 +18,8 @@ export class AutorComponent implements OnInit{
     private sysNotificationService: SysNotificationService
   ) {}
 
-  autorList: any[] = [];
-  filteredAutor: any = [];
+  autorList: Autor[] = [];
+  filteredAutor: Autor[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
 
@@ -31,7 +32,7 @@ export class AutorComponent implements OnInit{
 
   fetchAutores(page: number, extraParams: any = {}): void {
     const params = {...this.baseParam, ...extraParams}
-    this.autorService.getAutores(page, params).subscribe((rta: any) => {
+    this.autorService.getAutores(page, params).subscribe((rta: AutoresResponse) => {
       this.autorList = rta.autores || [];
       this.filteredAutor = [...this.autorList];
       this.totalPages = rta.pages;
@@ -46,13 +47,13 @@ export class AutorComponent implements OnInit{
         { apodo: query },
       ];
 
-      const allResults: any[] = [];
+      const allResults: Autor[] = [];
       const seenIds = new Set<number>();
       let pending = paramsList.length;
 
       for (const params of paramsList) {
         this.autorService.getAutores(1, params).subscribe(
-          (response: any) => {
+          (response: AutoresResponse) => {
             if (response && response.autores) {
               for (const autor of response.autores) {
                 if (!seenIds.has(autor.id)) {

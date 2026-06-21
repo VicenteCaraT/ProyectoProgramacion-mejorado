@@ -6,6 +6,7 @@ import { ReseñasService } from '../../services/reviews/reseñas.service';
 import { RegisterModalComponent } from '../../components/modals/register-modal/register-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { Libro, Reseña, ReseñasResponse, PrestamoResponse } from '../../models/models';
 import { Location } from '@angular/common';
 
 @Component({
@@ -14,8 +15,8 @@ import { Location } from '@angular/common';
   styleUrl: './detalles-libro.component.css'
 })
 export class DetallesLibroComponent implements OnInit{
-  book: any; 
-  reviews: any[] = [];
+  book!: Libro;
+  reviews: Reseña[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
 
@@ -47,10 +48,10 @@ export class DetallesLibroComponent implements OnInit{
   }
 
   getBookReviews(id: number): void {
-    const params = { idLibro: this.book.id };
+    const params = { idLibro: String(id) };
     this.reviewService.getReviews(1, params).subscribe(
-      (reviewsResponse) => {
-        this.reviews = (reviewsResponse as any).reseñas;
+      (reviewsResponse: ReseñasResponse) => {
+        this.reviews = reviewsResponse.reseñas;
       },
       (error) => {
         console.error('Error al obtener las reseñas del libro: ', error);
@@ -77,11 +78,11 @@ export class DetallesLibroComponent implements OnInit{
 
     const prestamoData = {
       usuario: tokenUserId,
-      libro: [this.book.id]
+      libro: [this.book!.id]
     };
 
     this.loanService.postLoan(prestamoData).subscribe({
-      next: (response) => {
+      next: () => {
         this.sysNotificationService.showSuccess('Préstamo solicitado con éxito');
       },
       error: (error) => {
@@ -97,7 +98,9 @@ export class DetallesLibroComponent implements OnInit{
   changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
-      this.getBookReviews(this.currentPage);
+      if (this.book) {
+        this.getBookReviews(this.book.id);
+      }
     }
   }
 

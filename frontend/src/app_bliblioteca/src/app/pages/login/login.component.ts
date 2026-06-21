@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service'
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode';
+import { LoginResponse, JwtPayload } from '../../models/models';
 
 @Component({
   selector: 'app-login',
@@ -25,17 +26,15 @@ export class LoginComponent {
 
   irLogin(dataLogin: any) {
     this.authService.login(dataLogin).subscribe({
-      next: (rta: any) => {
+      next: (rta: LoginResponse) => {
         console.log('Exito: ', rta);
 
-        // Almacena el token
         localStorage.setItem('token', rta.access_token);
 
-        // Decodifica el token para obtener roles y demas cosas
-        let tokenPayload: any = jwtDecode(rta.access_token);
+        let tokenPayload: JwtPayload = jwtDecode<JwtPayload>(rta.access_token);
         localStorage.setItem('token_rol', tokenPayload.rol);
         localStorage.setItem('user_id', tokenPayload.id);
-        localStorage.setItem('estado_user', tokenPayload.estado)
+        localStorage.setItem('estado_user', String(tokenPayload.estado))
 
         // Si el usuario tiene rol "Pendiente" no puede entrar a la pagina
         if (tokenPayload.rol === 'Pendiente' || tokenPayload.estado === true) {
@@ -50,7 +49,7 @@ export class LoginComponent {
         } else {
           this.router.navigateByUrl('home');
         }
-      }, error: (err: any) => {
+      }, error: (err) => {
         alert('Usuario o constraseña Incorrecta');
         console.log('Error: ' + err);
         localStorage.removeItem('token');

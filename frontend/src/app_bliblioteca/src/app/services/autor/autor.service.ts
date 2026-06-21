@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
+import { Autor, AutorResponse, AutoresResponse } from '../../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,7 @@ export class AutorService {
         httpParams = httpParams.set('apodo', params.apodo)
       }
     }
-    return this.httpClient.get(`${this.url}/autores`, {headers: headers, params:httpParams}).pipe(first())
+    return this.httpClient.get<AutoresResponse>(`${this.url}/autores`, {headers: headers, params:httpParams}).pipe(first())
   }
 
   getAutorById(id: number) {
@@ -46,7 +47,7 @@ export class AutorService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.get(`${this.url}/autor/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<AutorResponse>(`${this.url}/autor/${id}`, {headers: headers}).pipe(first())
   } 
 
   postAutor(autorData:any) {
@@ -55,8 +56,7 @@ export class AutorService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(autorData)
-    return this.httpClient.post(`${this.url}/autores`, autorData, {headers: headers}).pipe(first())
+    return this.httpClient.post<AutorResponse>(`${this.url}/autores`, autorData, {headers: headers}).pipe(first())
   }
 
   updateAutor(id: number, autorData: any) {
@@ -65,8 +65,7 @@ export class AutorService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(autorData)
-    return this.httpClient.put(`${this.url}/autor/${id}`, autorData, {headers: headers}).pipe(first())
+    return this.httpClient.put<AutorResponse>(`${this.url}/autor/${id}`, autorData, {headers: headers}).pipe(first())
   }
 
   deleteAutor(id: number) {
@@ -75,6 +74,6 @@ export class AutorService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.delete(`${this.url}/autor/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/autor/${id}`, {headers: headers}).pipe(first())
   }
 }

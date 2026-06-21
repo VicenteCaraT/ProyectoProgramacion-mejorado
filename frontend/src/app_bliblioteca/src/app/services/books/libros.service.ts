@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
+import { Libro, LibroResponse, LibrosResponse } from '../../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -19,13 +20,6 @@ export class LibrosService {
       'Authorization': `Bearer ${auth_token}`
     })
     let httpParams = new HttpParams().set('page', page.toString());
-    // Probar que las paginas puedan ser opcionales
-    // let httpParams = new HttpParams();
-    
-    // // Añadir 'page' solo si está definido
-    // if (page !== undefined) {
-    //     httpParams = httpParams.set('page', page.toString());
-    // }
     if (params) {
       if (params.genero) {
         httpParams = httpParams.set('genero', params.genero)
@@ -57,7 +51,7 @@ export class LibrosService {
       }
     }
 
-    return this.httpClient.get(`${this.url}/libros`, {headers: headers, params: httpParams})
+    return this.httpClient.get<LibrosResponse>(`${this.url}/libros`, {headers: headers, params: httpParams})
   }
 
   getBooksById(id : number)  {
@@ -66,7 +60,7 @@ export class LibrosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.get(`${this.url}/libro/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Libro>(`${this.url}/libro/${id}`, {headers: headers}).pipe(first())
   }
 
   postBook(bookData:any) {
@@ -75,8 +69,7 @@ export class LibrosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(bookData)
-    return this.httpClient.post(`${this.url}/libros`, bookData, {headers: headers}).pipe(first())
+    return this.httpClient.post<LibroResponse>(`${this.url}/libros`, bookData, {headers: headers}).pipe(first())
   }
 
   updateBook(id: number, bookData: any) {
@@ -85,8 +78,7 @@ export class LibrosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(bookData)
-    return this.httpClient.put(`${this.url}/libro/${id}`, bookData, {headers: headers}).pipe(first())
+    return this.httpClient.put<LibroResponse>(`${this.url}/libro/${id}`, bookData, {headers: headers}).pipe(first())
   }
 
   deleteBook(id: number) {
@@ -95,6 +87,6 @@ export class LibrosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.delete(`${this.url}/libro/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/libro/${id}`, {headers: headers}).pipe(first())
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
 import { Router } from '@angular/router';
+import { Libro, LibrosResponse } from '../../models/models';
 
 @Component({
   selector: 'app-top',
@@ -14,8 +15,8 @@ export class TopComponent implements OnInit{
     private router: Router
   ) {}
 
-  bookList: any[] = [];
-  filteredBook: any[] = [];
+  bookList: Libro[] = [];
+  filteredBook: Libro[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
 
@@ -24,7 +25,7 @@ export class TopComponent implements OnInit{
   }
 
   fetchTopBooks(page: number): void {
-    this.bookService.getBooks(page, { orden: 'ranking' }).subscribe((rta: any) => {
+    this.bookService.getBooks(page, { orden: 'ranking' }).subscribe((rta: LibrosResponse) => {
       console.log("Libros API:", rta);
       this.bookList = rta.libros || [];
       this.filteredBook = [...this.bookList];
@@ -39,7 +40,7 @@ export class TopComponent implements OnInit{
     }
   }
 
-  goToBook(bookID: string): void {
-    this.router.navigate(['/libro', bookID]);
+  goToBook(bookID: number): void {
+    this.router.navigate(['/libro', String(bookID)]);
   }
 }

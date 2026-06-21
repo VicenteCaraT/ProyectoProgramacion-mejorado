@@ -4,6 +4,7 @@ import { UsuariosService } from '../../services/users/usuarios.service';
 import { RegisterModalComponent } from '../modals/register-modal/register-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Usuario } from '../../models/models';
 
 @Component({
   selector: 'app-navbar',
@@ -11,7 +12,7 @@ import { Router } from '@angular/router';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit{
-  user: any; //datos del usuario actual
+  user: Usuario | null = null;
 
   constructor(
     private usuarioService: UsuariosService,

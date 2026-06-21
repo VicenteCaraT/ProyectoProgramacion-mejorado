@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
+import { Prestamo, PrestamoResponse, PrestamosResponse } from '../../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -79,7 +80,7 @@ export class PrestamosService {
         httpParams = httpParams.set('orden', params.orden)
       }
     }
-    return this.httpClient.get(`${this.url}/prestamos`, {headers: headers, params:httpParams}).pipe(first())
+    return this.httpClient.get<PrestamosResponse>(`${this.url}/prestamos`, {headers: headers, params:httpParams}).pipe(first())
   }
 
   getLoanById(id: number) {
@@ -88,7 +89,7 @@ export class PrestamosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.get(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Prestamo>(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
   } 
 
   postLoan(loanData:any) {
@@ -97,8 +98,7 @@ export class PrestamosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(loanData)
-    return this.httpClient.post(`${this.url}/prestamos`, loanData, {headers: headers}).pipe(first())
+    return this.httpClient.post<PrestamoResponse>(`${this.url}/prestamos`, loanData, {headers: headers}).pipe(first())
   }
 
   updateLoan(id: number, loanData: any) {
@@ -107,8 +107,7 @@ export class PrestamosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(loanData)
-    return this.httpClient.put(`${this.url}/prestamo/${id}`, loanData, {headers: headers}).pipe(first())
+    return this.httpClient.put<PrestamoResponse>(`${this.url}/prestamo/${id}`, loanData, {headers: headers}).pipe(first())
   }
 
   deleteLoan(id: number) {
@@ -117,7 +116,7 @@ export class PrestamosService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.delete(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/prestamo/${id}`, {headers: headers}).pipe(first())
   }
 
   patchLoans() {
@@ -127,7 +126,7 @@ export class PrestamosService {
     'Authorization': `Bearer ${auth_token}`
   });
   return this.httpClient
-    .patch(`${this.url}/prestamos`, {}, { headers: headers })
+    .patch<{message: string}>(`${this.url}/prestamos`, {}, { headers: headers })
     .pipe(first());
 }
 }

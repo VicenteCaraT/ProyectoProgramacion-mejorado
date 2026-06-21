@@ -4,6 +4,7 @@ import { EditarPerfilComponent } from '../../components/modals/user-modals/edita
 import { AuthService } from '../../services/auth/auth.service'
 import { Router } from '@angular/router';
 import { UsuariosService } from '../../services/users/usuarios.service';
+import { Usuario } from '../../models/models';
 
 @Component({
   selector: 'app-perfil',
@@ -11,7 +12,7 @@ import { UsuariosService } from '../../services/users/usuarios.service';
   styleUrl: './perfil.component.css'
 })
 export class PerfilComponent implements OnInit {
-  user: any;
+  user: Usuario | null = null;
 
   constructor(
     private dialog: MatDialog,

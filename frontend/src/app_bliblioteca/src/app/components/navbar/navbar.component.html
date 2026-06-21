@@ -2,7 +2,7 @@
     <nav class="navbar navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" (click)="checkUser($event)" style="cursor: pointer;">
-                <img *ngIf="user?.img; else noUserIcon" [src]="user.img" class="rounded-circle me-2" width="40" alt="User Image">
+                <img *ngIf="user?.img; else noUserIcon" [src]="user?.img" class="rounded-circle me-2" width="40" alt="User Image">
                 <ng-template #noUserIcon>
                     <i class="fas fa-user-circle me-2"></i>
                 </ng-template>

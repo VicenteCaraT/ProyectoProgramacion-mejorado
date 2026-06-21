@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { UsuariosService } from '../../services/users/usuarios.service';
-import { catchError, of, race, tap } from 'rxjs';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { Usuario, UsuariosResponse } from '../../models/models';
 
 @Component({
   selector: 'app-users',
@@ -18,8 +18,8 @@ export class UsersComponent implements OnInit{
     private sysNotificationService: SysNotificationService
   ) {}
 
-  usersList:any[] = [];
-  filteredUsers:any = [];
+  usersList: Usuario[] = [];
+  filteredUsers: Usuario[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
 
@@ -32,7 +32,7 @@ export class UsersComponent implements OnInit{
 
   fetchUsers(page: number, extraParams: any = {}): void {
     const params = {...this.baseParams, ...extraParams}
-    this.usuarioService.getUsers(page, params).subscribe((rta: any) => {
+    this.usuarioService.getUsers(page, params).subscribe((rta: UsuariosResponse) => {
       this.usersList = rta.usuarios || [];
       this.filteredUsers = [...this.usersList];
       this.totalPages = rta.pages;
@@ -42,7 +42,7 @@ export class UsersComponent implements OnInit{
   handleSearch(query: string) {
     if (query) {
       this.usuarioService.getUsers(1, { nombre: query }).subscribe(
-        (response: any) => {
+        (response: UsuariosResponse) => {
           if (response && response.usuarios) {
             this.filteredUsers = response.usuarios;
           } else {

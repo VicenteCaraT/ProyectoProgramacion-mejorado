@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GuardadosService } from '../../services/saves/guardados.service';
 import { Router } from '@angular/router';
+import { Libro, GuardadosResponse } from '../../models/models';
 
 @Component({
   selector: 'app-save',
@@ -8,8 +9,8 @@ import { Router } from '@angular/router';
   styleUrl: './save.component.css'
 })
 export class SaveComponent implements OnInit{
-  bookList: any[] = [];
-  filteredBook: any[] = [];
+  bookList: Libro[] = [];
+  filteredBook: Libro[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
   userId: string | undefined;
@@ -27,9 +28,9 @@ export class SaveComponent implements OnInit{
     fetchSaves(page: number): void {
       if (!this.userId) return;
       this.guardadosService.getSaves(page, { idUsuario: this.userId }).subscribe({
-        next: (res: any) => {
+        next: (res: GuardadosResponse) => {
           console.log("Guardados:", res);
-          this.bookList = res.guardados.map((item: any) => item.libro);
+          this.bookList = res.guardados.map((item) => item.libro);
           this.filteredBook = [...this.bookList];
           this.totalPages = res.pages || 1;
         },
@@ -39,8 +40,8 @@ export class SaveComponent implements OnInit{
       });
   }
 
-    goToBook(bookID: string) {
-    this.router.navigate(['/libro', bookID])
+    goToBook(bookID: number) {
+    this.router.navigate(['/libro', String(bookID)])
   }
 
     changePage(newPage: number): void {

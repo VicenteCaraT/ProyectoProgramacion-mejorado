@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NotificacionesService } from '../../services/notifications/notificaciones.service';
+import { Notificacion, NotificacionesResponse } from '../../models/models';
 
 @Component({
   selector: 'app-notificaciones',
@@ -7,7 +8,7 @@ import { NotificacionesService } from '../../services/notifications/notificacion
   styleUrl: './notificaciones.component.css'
 })
 export class NotificacionesComponent implements OnInit {
-  notifications: any[] = []; 
+  notifications: Notificacion[] = []; 
   userID: string = '';
   currentPage: number = 1;
   totalPages: number = 1;
@@ -21,7 +22,7 @@ export class NotificacionesComponent implements OnInit {
 
   getNotifications(page: number) {
     this.notificationService.getNotifications(page, { usuario: this.userID })
-      .subscribe((rta: any) => {
+      .subscribe((rta: NotificacionesResponse) => {
         this.notifications = rta.notificaciones || [];
         this.totalPages = rta.pages || 1;
       });

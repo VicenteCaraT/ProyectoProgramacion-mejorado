@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { first } from 'rxjs';
-import { Observable } from 'rxjs/internal/Observable';
+import { Reseña, ReseñaResponse, ReseñasResponse } from '../../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -68,7 +68,7 @@ export class ReseñasService {
     }
     
     
-    return this.httpClient.get(`${this.url}/reseñas`, {headers: headers, params: httpParams}).pipe(first())
+    return this.httpClient.get<ReseñasResponse>(`${this.url}/reseñas`, {headers: headers, params: httpParams}).pipe(first())
   }
 
   getReviewById(id: number) {
@@ -77,7 +77,7 @@ export class ReseñasService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.get(`${this.url}/reseña/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Reseña>(`${this.url}/reseña/${id}`, {headers: headers}).pipe(first())
   }
 
   postReview(reviewData:any) {
@@ -86,8 +86,7 @@ export class ReseñasService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(reviewData)
-    return this.httpClient.post(`${this.url}/reseñas`, reviewData, {headers: headers}).pipe(first())
+    return this.httpClient.post<ReseñaResponse>(`${this.url}/reseñas`, reviewData, {headers: headers}).pipe(first())
   }
 
 
@@ -97,8 +96,7 @@ export class ReseñasService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    console.log(reviewData)
-    return this.httpClient.put(`${this.url}/reseña/${id}`, reviewData, {headers: headers}).pipe(first())
+    return this.httpClient.put<ReseñaResponse>(`${this.url}/reseña/${id}`, reviewData, {headers: headers}).pipe(first())
   }
 
   deleteReview(id: number) {
@@ -107,6 +105,6 @@ export class ReseñasService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.delete(`${this.url}/reseña/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/reseña/${id}`, {headers: headers}).pipe(first())
   }
 }

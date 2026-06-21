@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { RegisterService } from '../../services/auth/register.service';
+import { Usuario } from '../../models/models';
 
 
 const onlyLetters: ValidatorFn = Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/);
@@ -36,11 +37,11 @@ export class SignupComponent {
 
   register(registerData: any) {
     this.registerService.register(registerData).subscribe({
-      next: (rta: any) => {
+      next: (rta: Usuario) => {
         alert('Registro Exitoso');
         console.log('Exito: ', rta);
         this.router.navigateByUrl('login')
-      }, error: (err: any) => {
+      }, error: (err) => {
         alert('Error al Registrarse');
         console.log('Error: ' + err);
       }, complete: () => {

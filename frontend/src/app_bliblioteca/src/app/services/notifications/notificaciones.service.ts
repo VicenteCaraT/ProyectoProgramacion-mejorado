@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
+import { Notificacion, NotificacionesResponse } from '../../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class NotificacionesService {
       httpParams = httpParams.set('usuario', params.usuario);
     }
 
-    return this.httpClient.get(`${this.url}/notificaciones`, {headers: headers, params: httpParams})
+    return this.httpClient.get<NotificacionesResponse>(`${this.url}/notificaciones`, {headers: headers, params: httpParams})
   }
 
   getNotificationByIs(id: number) {
@@ -33,7 +34,7 @@ export class NotificacionesService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.get(`${this.url}/notificacion/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.get<Notificacion>(`${this.url}/notificacion/${id}`, {headers: headers}).pipe(first())
   }
 
   deleteNotification(id: number) {
@@ -42,7 +43,7 @@ export class NotificacionesService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${auth_token}`
     })
-    return this.httpClient.delete(`${this.url}/notificacion/${id}`, {headers: headers}).pipe(first())
+    return this.httpClient.delete<void>(`${this.url}/notificacion/${id}`, {headers: headers}).pipe(first())
   }
 
 }

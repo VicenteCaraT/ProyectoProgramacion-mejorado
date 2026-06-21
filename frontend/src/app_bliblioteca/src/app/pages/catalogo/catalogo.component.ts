@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { LibrosService } from '../../services/books/libros.service';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { Libro, LibrosResponse } from '../../models/models';
 
 @Component({
   selector: 'app-catalogo',
@@ -17,8 +18,8 @@ export class CatalogoComponent implements OnInit{
     private sysNotificationService: SysNotificationService
   ) {}
 
-  bookList:any[] = []
-  filteredBook:any = []
+  bookList: Libro[] = []
+  filteredBook: Libro[] = []
   currentPage: number = 1;
   totalPages: number = 1;
 
@@ -31,7 +32,7 @@ export class CatalogoComponent implements OnInit{
 
   fetchBooks(page: number, extraParams: any = {}): void {
     const params = {...this.baseParam, ...extraParams}
-    this.bookService.getBooks(page, params).subscribe((rta: any) => {
+    this.bookService.getBooks(page, params).subscribe((rta: LibrosResponse) => {
       this.bookList = rta.libros || [];
       this.filteredBook = [...this.bookList];
       this.totalPages = rta.pages;
@@ -48,13 +49,13 @@ export class CatalogoComponent implements OnInit{
         { editorial: query }
       ];
 
-      const allResults: any[] = [];
+      const allResults: Libro[] = [];
       const seenIds = new Set<number>();
       let pending = paramsList.length;
 
       for (const params of paramsList) {
         this.bookService.getBooks(1, params).subscribe(
-          (response: any) => {
+          (response: LibrosResponse) => {
             if (response && response.libros) {
               for (const libro of response.libros) {
                 if (!seenIds.has(libro.id)) {

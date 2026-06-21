@@ -5,6 +5,7 @@ import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.c
 import { PrestamosService } from '../../services/loans/prestamos.service';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
+import { Prestamo, PrestamosResponse } from '../../models/models';
 import { ActivatedRoute } from '@angular/router';
 
 
@@ -24,8 +25,8 @@ export class PrestamoComponent implements OnInit{
 
   ) {}
 
-  loanList:any[] = []
-  filteredLoans:any[] = []
+  loanList: Prestamo[] = []
+  filteredLoans: Prestamo[] = []
   currentPage: number = 1;
   totalPages: number = 1;
 
@@ -43,7 +44,7 @@ export class PrestamoComponent implements OnInit{
 
     fetchLoans(page: number, extraParams: any = {}): void {
       const params = {...this.baseParams, ...extraParams}
-      this.loanService.getLoans(page, params).subscribe((rta: any) => {
+      this.loanService.getLoans(page, params).subscribe((rta: PrestamosResponse) => {
         this.loanList = rta.prestamos || [];
         this.filteredLoans = [...this.loanList];
         this.totalPages = rta.pages;
@@ -61,13 +62,13 @@ export class PrestamoComponent implements OnInit{
         { nombre_usuario: query }
       ];
 
-      const allResults: any[] = [];
+      const allResults: Prestamo[] = [];
       const seenIds = new Set<number>();
       let pending = paramsList.length;
 
       for ( const params of paramsList) {
         this.loanService.getLoans(1, params).subscribe(
-          (response: any) => {
+          (response: PrestamosResponse) => {
             if (response && response.prestamos) {
               for (const prestamo of response.prestamos) {
                 if(!seenIds.has(prestamo.id)) {
@@ -191,7 +192,7 @@ export class PrestamoComponent implements OnInit{
             width: '500px',
             data: {
                 loan: loan,
-                reviews: (reviewsResponse as any).reseñas
+                reviews: reviewsResponse.reseñas
             }
         });
     });
@@ -212,7 +213,7 @@ export class PrestamoComponent implements OnInit{
 
   actualizarPrestamosVencidos(): void {
   this.loanService.patchLoans().subscribe({
-    next: (res: any) => {
+    next: (res: {message: string}) => {
       this.sysNotificationService.showSuccess(res.message);
       this.refreshLoanList()
     },
