@@ -5,6 +5,7 @@ from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 from main.services import PrestamoService
 from main.dtos import PrestamoDTO
+from .helpers import paginated_response
 
 
 class Prestamo(Resource):
@@ -13,13 +14,13 @@ class Prestamo(Resource):
     @role_required(roles=["Admin", "Usuario"])
     def get(self, id):
         prestamo = PrestamoService.get_by_id(id)
-        return PrestamoDTO.full(prestamo, prestamo.fk_user_prestamo, prestamo.fk_idLibro)
+        return PrestamoDTO.full(prestamo)
 
     @handle_errors
     @role_required(roles=["Admin"])
     def put(self, id):
         prestamo = PrestamoService.update(id, request.get_json())
-        return{"message": "Préstamo actualizado correctamente.", "prestamo": PrestamoDTO.full(prestamo, prestamo.fk_user_prestamo, prestamo.fk_idLibro)}, 200
+        return{"message": "Préstamo actualizado correctamente.", "prestamo": PrestamoDTO.full(prestamo)}, 200
     
     @handle_errors
     @role_required(roles=["Admin"])
@@ -32,32 +33,17 @@ class Prestamos(Resource):
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def get(self):
-        filters = {
-            "page": int(request.args.get("page", 1)),
-            "per_page": int(request.args.get("per_page", 10)),
-            "idUsuario": request.args.get("idUsuario"),
-            "inicio_prestamo": request.args.get("inicio_prestamo"),
-            "fin_prestamo": request.args.get("fin_prestamo"),
-            "cant_libros": request.args.get("cant_libros"),
-            "libro_id": request.args.get("libro_id"),
-            "titulo": request.args.get("titulo"),
-            "estado": request.args.get("estado"),
-            "nombre_usuario": request.args.get("nombre_usuario"),
-        }
-        filters = {k: v for k, v in filters.items() if v is not None}
-        result = PrestamoService.get_all(filters)
-        return jsonify({
-            'prestamos': [PrestamoDTO.full(p, p.fk_user_prestamo, p.fk_idLibro) for p in result.items],
-            'total': result.total,
-            'pages': result.pages,
-            'page': int(request.args.get("page", 1))
-        })
+        return paginated_response(PrestamoService, PrestamoDTO, 'prestamos',
+            idUsuario="idUsuario", inicio_prestamo="inicio_prestamo",
+            fin_prestamo="fin_prestamo", cant_libros="cant_libros",
+            libro_id="libro_id", titulo="titulo", estado="estado",
+            nombre_usuario="nombre_usuario")
         
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def post(self):
         prestamo = PrestamoService.create(request.get_json())
-        return {"message": "Préstamo creado exitosamente.", "prestamo": PrestamoDTO.full(prestamo, prestamo.fk_user_prestamo, prestamo.fk_idLibro)}, 201
+        return {"message": "Préstamo creado exitosamente.", "prestamo": PrestamoDTO.full(prestamo)}, 201
         
     @handle_errors
     @role_required(roles=["Admin"])

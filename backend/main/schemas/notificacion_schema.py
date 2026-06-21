@@ -1,8 +1,6 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.notificacion_model import Notificacion
+from marshmallow import Schema, fields, validate
 
-class NotificacionSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Notificacion
-        load_instance = True
-        include_fk = True
+
+class NotificacionSchema(Schema):
+    usuario = fields.Integer(required=True)
+    descripcion = fields.String(required=True, validate=validate.Length(min=1, max=255))

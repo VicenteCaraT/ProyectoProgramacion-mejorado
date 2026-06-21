@@ -1,8 +1,9 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.reseña_model import Reseña
+from marshmallow import Schema, fields, validate
 
-class ReseñaSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Reseña
-        load_instance = True
-        include_fk = True
+
+class ReseñaSchema(Schema):
+    usuario = fields.Integer(required=True)
+    libro = fields.Integer(required=True)
+    fecha = fields.String(required=True)
+    descripcion = fields.String(required=True, validate=validate.Length(min=1, max=255))
+    valoracion = fields.String(required=True)

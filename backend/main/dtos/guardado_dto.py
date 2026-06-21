@@ -3,9 +3,9 @@ from .libro_dto import LibroDTO
 
 class GuardadoDTO:
     @staticmethod
-    def full(guardado, usuario, libro):
+    def full(guardado):
         return {
             "id": guardado.idGuardado,
-            "usuario": UsuarioDTO.full(usuario),
-            "libro": LibroDTO.full(libro)
+            "usuario": UsuarioDTO.full(guardado.fk_user_guardado),
+            "libro": LibroDTO.full(guardado.fk_libro_guardado)
         }

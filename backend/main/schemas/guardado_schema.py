@@ -1,8 +1,5 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.guardado_model import Guardado
+from marshmallow import Schema, fields
 
-class GuardadoSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Guardado
-        load_instance = True
-        include_fk = True
+
+class GuardadoSchema(Schema):
+    libro = fields.Integer(required=True)

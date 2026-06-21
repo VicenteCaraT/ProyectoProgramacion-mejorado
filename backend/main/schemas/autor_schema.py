@@ -1,9 +1,7 @@
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from main.models.autor_model import Autor
+from marshmallow import Schema, fields, validate
 
-class AutorSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Autor
-        load_instance = True
-        include_fk = True
-        
+
+class AutorSchema(Schema):
+    nombre = fields.String(required=True, validate=validate.Length(min=1, max=60))
+    apellido = fields.String(required=True, validate=validate.Length(min=1, max=60))
+    apodo = fields.String(required=True, validate=validate.Length(min=1, max=60))

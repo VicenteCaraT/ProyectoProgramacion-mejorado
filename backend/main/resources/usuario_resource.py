@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from main.auth.decorators import role_required, handle_errors
 from main.services import UsuarioService
 from main.dtos import UsuarioDTO
+from .helpers import paginated_response
 
 
 class Usuario(Resource):
@@ -41,24 +42,9 @@ class Usuarios(Resource):
     @handle_errors
     @jwt_required(optional=True)
     def get(self):
-        filters = {
-            "page": int(request.args.get("page", 1)),
-            "per_page": int(request.args.get("per_page", 10)),
-            "rol": request.args.get("rol"),
-            "nombre": request.args.get("nombre"),
-            "dni": request.args.get("dni"),
-            "telefono": request.args.get("telefono"),
-            "email": request.args.get("email"),
-            "estado": request.args.get("estado"),
-        }
-        filters = {k: v for k, v in filters.items() if v is not None}
-        result = UsuarioService.get_all(filters)
-        return jsonify({
-            'usuarios': [UsuarioDTO.full(u) for u in result.items],
-            'total': result.total,
-            'pages': result.pages,
-            'page': int(request.args.get("page", 1))
-        })
+        return paginated_response(UsuarioService, UsuarioDTO, 'usuarios',
+            rol="rol", nombre="nombre", dni="dni",
+            telefono="telefono", email="email", estado="estado")
         
     @handle_errors
     def post(self):
