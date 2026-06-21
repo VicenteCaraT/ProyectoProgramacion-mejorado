@@ -4,6 +4,8 @@ from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from main.services import GuardadoService
 from main.dtos import GuardadoDTO
+from marshmallow import ValidationError
+from main.schemas import GuardadoSchema
 from .helpers import paginated_response
 
 class Guardado(Resource):
@@ -31,11 +33,12 @@ class Guardados(Resource):
     @handle_errors
     @jwt_required()
     def post(self):
-        data = request.get_json()
-        libro_id = data.get("libro")
-        if not libro_id:
-            return {"message": "Falta el ID del libro"}, 400
-        guardado = GuardadoService.create(get_jwt_identity(), libro_id)
+        schema = GuardadoSchema()
+        try:
+            data = schema.load(request.get_json())
+        except ValidationError as e:
+            return {"message": "Datos inválidos", "errors": e.messages}, 422
+        guardado = GuardadoService.create(get_jwt_identity(), data["libro"])
         return {
             "message": "Libro guardado exitosamente.",
             "guardado": GuardadoDTO.full(guardado)

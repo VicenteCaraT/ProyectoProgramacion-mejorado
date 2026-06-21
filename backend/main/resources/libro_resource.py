@@ -3,6 +3,8 @@ from flask import request, jsonify
 from main.auth.decorators import role_required, handle_errors
 from main.services import LibroService
 from main.dtos import LibroDTO
+from marshmallow import ValidationError
+from main.schemas import LibroSchema
 
 
 class Libro(Resource):
@@ -76,7 +78,12 @@ class Libros(Resource):
     @handle_errors
     @role_required(roles=["Admin"])
     def post(self):
-        libro = LibroService.create(request.get_json())
+        schema = LibroSchema()
+        try:
+            data = schema.load(request.get_json())
+        except ValidationError as e:
+            return {"message": "Datos inválidos", "errors": e.messages}, 422
+        libro = LibroService.create(data)
         return {"message": "Libro creado exitosamente", "libro": LibroDTO.full(libro)}, 201
         
 if __name__ == '__main__':

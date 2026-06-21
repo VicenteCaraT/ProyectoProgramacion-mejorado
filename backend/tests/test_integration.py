@@ -290,7 +290,7 @@ def test_prestamo_delete(client, auth_headers, app):
     assert resp.status_code == 201
     prestamo_id = resp.get_json()["prestamo"]["id"]
     resp = client.delete(f"/prestamo/{prestamo_id}", headers=auth_headers)
-    assert resp.status_code == 200
+    assert resp.status_code == 204
 
 ### TEST USUARIO ###
 def test_usuario_create_and_get(client, auth_headers, app):
@@ -313,7 +313,7 @@ def test_usuario_update(client, auth_headers, app):
     resp = client.post("/usuarios", json={
         "user": "original", "contraseña": "pass123",
         "nombre": "Original", "apellido": "Uno",
-        "dni": 11111111, "telefono": "26111111que test11",
+        "dni": 11111111, "telefono": "261111111111",
         "email": "orig@test.com", "rol": "Usuario", "estado": True
     }, headers=auth_headers)
     usuario_id = resp.get_json()["usuario"]["id"]

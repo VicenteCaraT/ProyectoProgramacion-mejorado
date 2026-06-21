@@ -5,6 +5,8 @@ from main.auth.decorators import role_required, handle_errors
 from main.services import AutorService
 from main.dtos import AutorDTO
 from .helpers import paginated_response
+from marshmallow import ValidationError
+from main.schemas import AutorSchema
 
 class Autor(Resource):
     
@@ -38,9 +40,13 @@ class Autores(Resource):
     @handle_errors
     @role_required(roles=["Admin"])
     def post(self):
-        autor = AutorService.create(request.get_json())
+        schema = AutorSchema()
+        try:
+            data = schema.load(request.get_json())
+        except ValidationError as e:
+            return {"message": "Datos inválidos", "errors": e.messages}, 422
+        autor = AutorService.create(data)
         return {"message": "Autor creado exitosamente", "autor": AutorDTO.full(autor)}, 201
-    
     
 if __name__ == '__main__':
     pass

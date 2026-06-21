@@ -5,6 +5,8 @@ from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import get_jwt_identity, get_jwt, jwt_required
 from main.services import PrestamoService
 from main.dtos import PrestamoDTO
+from marshmallow import ValidationError
+from main.schemas import PrestamoSchema
 from .helpers import paginated_response
 
 
@@ -26,7 +28,7 @@ class Prestamo(Resource):
     @role_required(roles=["Admin"])
     def delete(self, id):
         PrestamoService.delete(id)
-        return {"message": "Prástamo eliminado y libros devueltos al stock"}, 200
+        return '', 204
     
 class Prestamos(Resource):
     
@@ -42,7 +44,12 @@ class Prestamos(Resource):
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def post(self):
-        prestamo = PrestamoService.create(request.get_json())
+        schema = PrestamoSchema()
+        try:
+            data = schema.load(request.get_json())
+        except ValidationError as e:
+            return {"message": "Datos inválidos", "errors": e.messages}, 422
+        prestamo = PrestamoService.create(data)
         return {"message": "Préstamo creado exitosamente.", "prestamo": PrestamoDTO.full(prestamo)}, 201
         
     @handle_errors

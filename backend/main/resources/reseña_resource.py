@@ -4,6 +4,8 @@ from main.auth.decorators import role_required, handle_errors
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from main.services import ReseñaService
 from main.dtos import ReseñaDTO
+from marshmallow import ValidationError
+from main.schemas import ReseñaSchema
 from .helpers import paginated_response
 
 
@@ -48,7 +50,12 @@ class Reseñas(Resource):
     @handle_errors
     @role_required(roles=["Admin", "Usuario"])
     def post(self):
-        reseña = ReseñaService.create(request.get_json())
+        schema = ReseñaSchema()
+        try:
+            data = schema.load(request.get_json())
+        except ValidationError as e:
+            return {"message": "Datos inválidos", "errors": e.messages}, 422
+        reseña = ReseñaService.create(data)
         return {"message": "Reseña creada exitosamente.", "reseña": ReseñaDTO.full(reseña)}, 201
     
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ auth = Blueprint('auth', __name__, url_prefix='/auth')
 def login():
     user = UsuarioRepository.get_by_email(request.get_json().get("email"))
     if not user or not user.validate_pass(request.get_json().get("contraseña")):
-        return 'Incorrect password', 401
+        return {"message": "Incorrect password"}, 401
     access_token = create_access_token(identity=user)
     return {
         'id': str(user.idUser),
@@ -23,10 +23,10 @@ def login():
 def register():
     user = UsuarioModel.from_json(request.get_json())
     if UsuarioRepository.exists_by_email(user.email):
-        return 'Duplicated mail', 409
+        return {"message": "Duplicated mail"}, 409
     try:
         UsuarioRepository.save(user)
         sendMail([user.email], "Wellcome!", "register", user=user)
     except Exception as error:
-        return str(error), 409
+        return {"message": str(error)}, 409
     return UsuarioDTO.full(user), 201
