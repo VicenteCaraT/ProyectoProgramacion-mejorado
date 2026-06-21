@@ -1,21 +1,13 @@
 from main.repositories import GuardadoRepository, UsuarioRepository, LibroRepository
 from main.models import GuardadoModel
+from .base_service import BaseService
 
-class GuardadoService:
-    @staticmethod
-    def get_by_id(id):
-        return GuardadoRepository.get_by_id(id)
+class GuardadoService(BaseService):
+    repository = GuardadoRepository
+    model = GuardadoModel
 
-    @staticmethod
-    def get_all(filters):
-        return GuardadoRepository.get_all(
-            page=filters.pop("page", 1),
-            per_page=filters.pop("per_page", 10),
-            filters=filters
-        )
-
-    @staticmethod
-    def create(user_id, libro_id):
+    @classmethod
+    def create(cls, user_id, libro_id):
         if UsuarioRepository.get_by_id(user_id) is None:
             raise ValueError(f"El usuario ID {user_id} no existe")
         if LibroRepository.get_by_id(libro_id) is None:
@@ -26,9 +18,4 @@ class GuardadoService:
         if existente.total > 0:
             raise ValueError("Este libro ya fue guardado por el usuario actual")
         guardado = GuardadoModel(fk_idUser=user_id, fk_idLibro=libro_id)
-        return GuardadoRepository.save(guardado)
-
-    @staticmethod
-    def delete(id):
-        guardado = GuardadoRepository.get_by_id(id)
-        GuardadoRepository.delete(guardado)
+        return cls.repository.save(guardado)
