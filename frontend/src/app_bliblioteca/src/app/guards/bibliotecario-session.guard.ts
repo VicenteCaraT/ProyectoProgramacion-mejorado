@@ -1,10 +1,10 @@
-import { Inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
 
 export const bibliotecarioSessionGuard: CanActivateFn = (route, state) => {
 
-  const router: Router = Inject(Router);
+  const router = inject(Router);
   const token = localStorage.getItem('token');
   const tokenRol = localStorage.getItem('token_rol');
 

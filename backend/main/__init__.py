@@ -76,6 +76,10 @@ def create_app():
     def not_found(error):
         return {"message": "Recurso no encontrado"}, 404
     
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return {"message": "Método no permitido"}, 405
+
     @app.errorhandler(500)
     def internal_error(error):
         return {"message": "Error interno del servidor"}, 500

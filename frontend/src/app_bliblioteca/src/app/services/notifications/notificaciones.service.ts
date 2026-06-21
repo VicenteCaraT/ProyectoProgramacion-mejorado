@@ -36,15 +36,6 @@ export class NotificacionesService {
     return this.httpClient.get(`${this.url}/notificacion/${id}`, {headers: headers}).pipe(first())
   }
 
-  postNotification(page: number, params?: {idUsuario:string}) {
-    let auth_token = localStorage.getItem('token')
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${auth_token}`
-    })
-    return this.httpClient.post(`${this.url}/notificaciones`, {headers: headers})
-  }
-
   deleteNotification(id: number) {
     let auth_token = localStorage.getItem('token')
     const headers = new HttpHeaders({

@@ -4,6 +4,8 @@ from main.repositories import UsuarioRepository
 from main.dtos import UsuarioDTO
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from main.mail.functions import sendMail
+from marshmallow import ValidationError
+from main.schemas import UsuarioSchema
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -21,7 +23,12 @@ def login():
 
 @auth.route('/register', methods=['POST'])
 def register():
-    user = UsuarioModel.from_json(request.get_json())
+    schema = UsuarioSchema()
+    try:
+        data = schema.load(request.get_json())
+    except ValidationError as e:
+        return {"message": "Datos inválidos", "errors": e.messages}, 422
+    user = UsuarioModel.from_json(data)
     if UsuarioRepository.exists_by_email(user.email):
         return {"message": "Duplicated mail"}, 409
     try:

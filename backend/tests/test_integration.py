@@ -64,7 +64,8 @@ def test_register_duplicate_email(client, app):
     resp = client.post("/auth/register", json={
         "user": "other", "nombre": "Otro", "apellido": "User",
         "dni": 22222222, "telefono": "2612222222",
-        "email": "dup@test.com", "contraseña": "pass456"
+        "email": "dup@test.com", "contraseña": "pass456",
+        "rol": "Usuario", "estado": True
     })
     assert resp.status_code == 409
 

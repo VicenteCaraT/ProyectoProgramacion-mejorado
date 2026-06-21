@@ -42,7 +42,7 @@ export class UsuariosService {
     }
     if (params) {
       if (params.email) {
-        httpParams = httpParams.set('rol', params.email)
+        httpParams = httpParams.set('email', params.email)
       }
     }
     if (params) {
