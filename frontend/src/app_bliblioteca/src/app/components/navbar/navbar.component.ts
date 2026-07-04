@@ -32,7 +32,6 @@ export class NavbarComponent implements OnInit{
           this.user = userData;
         },
         error: (err) => {
-          console.log('Error al cargar los datos del usuario: ', err)
         }
       });
     }

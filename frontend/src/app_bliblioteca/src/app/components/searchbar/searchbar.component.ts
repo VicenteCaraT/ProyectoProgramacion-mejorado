@@ -31,7 +31,6 @@ export class SearchbarComponent implements OnChanges{
   }
 
   onSearch() {
-    console.log('buscar: ', this.searchQuery);
     this.searchEvent.emit(this.searchQuery)
   }
 
@@ -84,7 +83,6 @@ export class SearchbarComponent implements OnChanges{
   }
 
   onFilterChange(option: { type?: string, value: string }) {
-    console.log('Filter changed:', option);
     this.filterChange.emit({ type: option.type || '', value: option.value });
   }
 

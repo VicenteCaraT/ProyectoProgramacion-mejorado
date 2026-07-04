@@ -2,37 +2,21 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { first } from 'rxjs';
 import { Autor, AutorResponse, AutoresResponse } from '../../models/models';
+import { environment } from '../../../environments/environment';
+import { buildParams } from '../../utils/http-params';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutorService {
-  url = '/api'
+  url = environment.apiUrl
 
   constructor(
     private httpClient: HttpClient
   ) { }
 
   getAutores(page: number, params?: {nombre?:string, apellido?:string, apodo?:string}) {
-    let httpParams = new HttpParams().set('page', page.toString());
-
-    if (params) {
-      if (params.nombre) {
-        httpParams = httpParams.set('nombre', params.nombre)
-      }
-    }
-    
-    if (params) {
-      if (params.apellido) {
-        httpParams = httpParams.set('apellido', params.apellido)
-      }
-    }
-
-    if (params) {
-      if (params.apodo) {
-        httpParams = httpParams.set('apodo', params.apodo)
-      }
-    }
+    const httpParams = buildParams(page, params);
     return this.httpClient.get<AutoresResponse>(`${this.url}/autores`, {params:httpParams}).pipe(first())
   }
 

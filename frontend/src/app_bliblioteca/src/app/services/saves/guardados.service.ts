@@ -2,30 +2,21 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { first } from 'rxjs';
 import { Guardado, GuardadoResponse, GuardadosResponse } from '../../models/models';
+import { environment } from '../../../environments/environment';
+import { buildParams } from '../../utils/http-params';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GuardadosService {
-  url = '/api'
+  url = environment.apiUrl
 
   constructor(
     private httpClient: HttpClient,
   ) { }
 
   getSaves(page: number, params?: {idUsuario?: string, libro_id?: string}) {
-    let httpParams = new HttpParams().set('page', page.toString());
-
-    if(params) {
-      if(params.idUsuario) {
-        httpParams = httpParams.set('idUsuario', params.idUsuario)
-      }
-    }
-    if(params) {
-      if(params.libro_id) {
-        httpParams = httpParams.set('libro_id', params.libro_id)
-      }
-    }
+    const httpParams = buildParams(page, params);
     return this.httpClient.get<GuardadosResponse>(`${this.url}/guardados`, {params:httpParams}).pipe(first())
   }
 

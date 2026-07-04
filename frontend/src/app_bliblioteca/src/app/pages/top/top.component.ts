@@ -26,7 +26,6 @@ export class TopComponent implements OnInit{
 
   fetchTopBooks(page: number): void {
     this.bookService.getBooks(page, { orden: 'ranking' }).subscribe((rta: LibrosResponse) => {
-      console.log("Libros API:", rta);
       this.bookList = rta.libros || [];
       this.filteredBook = [...this.bookList];
       this.totalPages = rta.pages;

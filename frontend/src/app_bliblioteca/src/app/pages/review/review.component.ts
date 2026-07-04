@@ -41,7 +41,6 @@ export class ReviewComponent implements OnInit{
   fetchReviews(page: number, extraParams: any = {}): void {
     const params = {...this.baseParams, ...extraParams}
     this.reviewService.getReviews(page, params).subscribe((rta: ReseñasResponse) => {
-      console.log('Reseñas API: ', rta);
       this.reviewList = rta.reseñas || [];
       this.filteredReviews = [...this.reviewList];
       this.totalPages = rta.pages;
@@ -83,8 +82,6 @@ export class ReviewComponent implements OnInit{
         } 
       });
       dialogRef.afterClosed().subscribe(result => {
-        console.log('El modal se cerro', result);
-
         if (result && operation === 'edit') {
           const valoracionFinal = `${result.valoracionNum}/5`;
           const payload = {

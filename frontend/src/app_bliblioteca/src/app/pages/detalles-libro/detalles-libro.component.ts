@@ -41,7 +41,6 @@ export class DetallesLibroComponent implements OnInit{
           this.getBookReviews(Number(bookId));
         },
         (error) => {
-          console.log('Error al obtener los detalles del libro: ', error);
         }
       );
     }

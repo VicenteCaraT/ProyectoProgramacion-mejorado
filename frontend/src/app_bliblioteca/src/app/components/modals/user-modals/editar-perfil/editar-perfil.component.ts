@@ -46,7 +46,6 @@ export class EditarPerfilComponent {
 
   saveChanges(): void {
     if (this.formPerfil.valid) {
-      console.log('Datos del formulario: ', this.formPerfil.value);
       this.handleSave(this.formPerfil.value)
     }
   }

@@ -13,7 +13,6 @@ export class PaginationComponent {
 
   changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
-      console.log('Emitiendo pageChange:', newPage);
       this.pageChange.emit(newPage);
     }
   }

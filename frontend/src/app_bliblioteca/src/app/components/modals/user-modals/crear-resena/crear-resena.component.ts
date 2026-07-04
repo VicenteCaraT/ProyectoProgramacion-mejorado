@@ -47,12 +47,8 @@ export class CrearResenaComponent {
             usuario: this.data.loan.usuario.id
         };
 
-        console.log('Datos del formulario: ', formData);
-        
-        // Llama al servicio para guardar la reseña
         this.reviewService.postReview(formData).subscribe(
             response => {
-                console.log('Reseña guardada con éxito:', response);
                 this.dialogRef.close(formData);
             },
             error => {

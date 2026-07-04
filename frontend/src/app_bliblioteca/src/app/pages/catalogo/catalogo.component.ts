@@ -111,8 +111,6 @@ export class CatalogoComponent implements OnInit{
       } 
     });
     dialogRef.afterClosed().subscribe( result => {
-      console.log('El modal se cerro', result);
-      
       if(result) {
         if (operation == 'create') {
           this.bookService.postBook(result).subscribe({

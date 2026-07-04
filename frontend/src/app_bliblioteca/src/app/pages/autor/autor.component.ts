@@ -108,8 +108,6 @@ export class AutorComponent implements OnInit{
         } 
       });
       dialogRef.afterClosed().subscribe( result => {
-        console.log('El modal se cerro', result);
-        
         if(result) {
           if (operation == 'create') {
             this.autorService.postAutor(result).subscribe({

@@ -126,7 +126,6 @@ export class AbmModalComponent {
         formData.libro = [formData.libro];
       }
 
-      console.log('Formulario enviado:', formData);
       this.handleSave(formData);
     }
   }

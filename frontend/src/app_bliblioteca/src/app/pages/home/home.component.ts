@@ -26,18 +26,13 @@ export class HomeComponent implements OnInit{
 
   ngOnInit(): void {
     this.bookService.getBooks(1).subscribe((rta: LibrosResponse) => {
-      console.log("Libros Api: ", rta);
       this.bookList = rta.libros || [];
       this.filteredBooks = [...this.bookList]
     })
-    //libros Harry Potter
     this.bookService.getBooks(1, {titulo:'Harry'}).subscribe((rta: LibrosResponse) => {
-      console.log("Harry Potter Libros:", rta);
       this.harryPotterBooks = rta.libros || []
     })
-    //libros de Fantasía
-        this.bookService.getBooks(1, {genero:'Fanta'}).subscribe((rta: LibrosResponse) => {
-      console.log("Fantasy Books:", rta);
+    this.bookService.getBooks(1, {genero:'Fanta'}).subscribe((rta: LibrosResponse) => {
       this. fantasyBooks= rta.libros || []
     })
 }

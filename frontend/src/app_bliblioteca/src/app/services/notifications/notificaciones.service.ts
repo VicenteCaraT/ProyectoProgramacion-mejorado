@@ -2,25 +2,22 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { first } from 'rxjs';
 import { Notificacion, NotificacionesResponse } from '../../models/models';
+import { environment } from '../../../environments/environment';
+import { buildParams } from '../../utils/http-params';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificacionesService {
-  url = '/api'
+  url = environment.apiUrl
 
   constructor(
     private httpClient: HttpClient,
   ) { }
 
   getNotifications(page: number, params?: {usuario:string}) {
-    let httpParams = new HttpParams().set('page', page.toString());
-
-    if (params?.usuario) {
-      httpParams = httpParams.set('usuario', params.usuario);
-    }
-
-    return this.httpClient.get<NotificacionesResponse>(`${this.url}/notificaciones`, {params: httpParams})
+    const httpParams = buildParams(page, params);
+    return this.httpClient.get<NotificacionesResponse>(`${this.url}/notificaciones`, {params: httpParams}).pipe(first())
   }
 
   getNotificationByIs(id: number) {

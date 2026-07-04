@@ -2,50 +2,21 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, first } from 'rxjs';
 import { Usuario, UsuarioResponse, UsuariosResponse } from '../../models/models';
+import { environment } from '../../../environments/environment';
+import { buildParams } from '../../utils/http-params';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuariosService {
-  url = '/api'
+  url = environment.apiUrl
 
   constructor(
     private httpClient: HttpClient
   ) { }
 
   getUsers(page: number, params?: {rol?:string, nombre?:string, dni?:string, telefono?:string, email?:string, estado?: string}) {
-    let httpParams = new HttpParams().set('page', page.toString());
-
-    if (params) {
-      if (params.rol) {
-        httpParams = httpParams.set('rol', params.rol)
-      }
-    }
-    if (params) {
-      if (params.nombre) {
-        httpParams = httpParams.set('nombre', params.nombre)
-      }
-    }
-    if (params) {
-      if (params.dni) {
-        httpParams = httpParams.set('dni', params.dni)
-      }
-    }
-    if (params) {
-      if (params.telefono) {
-        httpParams = httpParams.set('telefono', params.telefono)
-      }
-    }
-    if (params) {
-      if (params.email) {
-        httpParams = httpParams.set('email', params.email)
-      }
-    }
-    if (params) {
-      if (params.estado) {
-        httpParams = httpParams.set('estado', params.estado)
-      }
-    }
+    const httpParams = buildParams(page, params);
     return this.httpClient.get<UsuariosResponse>(`${this.url}/usuarios`, {params: httpParams}).pipe(first())
   }
 

@@ -29,7 +29,6 @@ export class SaveComponent implements OnInit{
       if (!this.userId) return;
       this.guardadosService.getSaves(page, { idUsuario: this.userId }).subscribe({
         next: (res: GuardadosResponse) => {
-          console.log("Guardados:", res);
           this.bookList = res.guardados.map((item) => item.libro);
           this.filteredBook = [...this.bookList];
           this.totalPages = res.pages || 1;

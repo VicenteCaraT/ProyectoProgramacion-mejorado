@@ -2,61 +2,21 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { first } from 'rxjs';
 import { Reseña, ReseñaResponse, ReseñasResponse } from '../../models/models';
+import { environment } from '../../../environments/environment';
+import { buildParams } from '../../utils/http-params';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReseñasService {
-  url = '/api'
+  url = environment.apiUrl
 
   constructor(
     private httpClient: HttpClient
   ) { }
 
   getReviews(page: number, params?: {nroValoracion?:string, ordenValoracion?:string, idUserPost?:string, fechaReseña?:string, Valoraciones_desc?:string, Valoraciones_asc?:string, idLibro?: string, titulo_libro?:string, nombre_usuario?:string}){
-    let httpParams = new HttpParams().set('page', page.toString());
-
-    if (params) {
-      if (params.nroValoracion) {
-        httpParams = httpParams.set('nroValoracion', params.nroValoracion)
-      }
-    }
-    if (params) {
-      if (params.ordenValoracion) {
-        httpParams = httpParams.set('ordenValoracion', params.ordenValoracion)
-      }
-    }
-    if (params) {
-      if (params.idUserPost) {
-        httpParams = httpParams.set('idUserPost', params.idUserPost)
-      }
-    }
-    if (params) {
-      if (params.Valoraciones_desc) {
-        httpParams = httpParams.set('Valoraciones_desc', params.Valoraciones_desc)
-      }
-    }
-    if (params) {
-      if (params.Valoraciones_asc) {
-        httpParams = httpParams.set('Valoraciones_asc', params.Valoraciones_asc)
-      }
-    }
-    if (params) {
-      if (params.idLibro) {
-        httpParams = httpParams.set('idLibro', params.idLibro)
-      }
-    }
-    if (params) {
-      if (params.nombre_usuario) {
-        httpParams = httpParams.set('nombre_usuario', params.nombre_usuario)
-      }
-    }
-    if (params) {
-      if (params.titulo_libro) {
-        httpParams = httpParams.set('titulo_libro', params.titulo_libro)
-      }
-    }
-    
+    const httpParams = buildParams(page, params);
     return this.httpClient.get<ReseñasResponse>(`${this.url}/reseñas`, {params: httpParams}).pipe(first())
   }
 

@@ -27,8 +27,6 @@ export class LoginComponent {
   irLogin(dataLogin: any) {
     this.authService.login(dataLogin).subscribe({
       next: (rta: LoginResponse) => {
-        console.log('Exito: ', rta);
-
         localStorage.setItem('token', rta.access_token);
 
         let tokenPayload: JwtPayload = jwtDecode<JwtPayload>(rta.access_token);
@@ -51,17 +49,13 @@ export class LoginComponent {
         }
       }, error: (err) => {
         alert('Usuario o constraseña Incorrecta');
-        console.log('Error: ' + err);
         localStorage.removeItem('token');
-      }, complete: () => {
-        console.log('Finalizo');
       }
     })
   }
 
   submit() { 
     if(this.loginForm.valid) {
-      console.log('Dato del formulario: ', this.loginForm.value);
       this.irLogin(this.loginForm.value);
     } else {
       alert('Los valores son requeridos');

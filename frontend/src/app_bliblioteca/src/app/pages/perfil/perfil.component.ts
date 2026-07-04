@@ -50,8 +50,6 @@ export class PerfilComponent implements OnInit {
       width: '500px',
       data: {...perfilData}
     });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('El modal se cerró', result)
-    })
+    dialogRef.afterClosed().subscribe()
   }
 }

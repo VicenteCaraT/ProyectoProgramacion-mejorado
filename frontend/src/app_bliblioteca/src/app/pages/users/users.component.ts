@@ -147,9 +147,7 @@ export class UsersComponent implements OnInit{
       error: (error) => {
         console.error('Error al aceptar usuario', error);
       },
-      complete: () => {
-        console.log('Usuario aceptado')
-      }
+      complete: () => {}
     })
   }
 }

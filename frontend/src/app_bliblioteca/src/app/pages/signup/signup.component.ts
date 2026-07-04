@@ -39,13 +39,9 @@ export class SignupComponent {
     this.registerService.register(registerData).subscribe({
       next: (rta: Usuario) => {
         alert('Registro Exitoso');
-        console.log('Exito: ', rta);
         this.router.navigateByUrl('login')
       }, error: (err) => {
         alert('Error al Registrarse');
-        console.log('Error: ' + err);
-      }, complete: () => {
-        console.log('Finalizo');
       }
     })
   }
