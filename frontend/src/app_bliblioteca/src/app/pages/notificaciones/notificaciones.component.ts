@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NotificacionesService } from '../../services/notifications/notificaciones.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { Notificacion, NotificacionesResponse } from '../../models/models';
 
 @Component({
@@ -13,10 +14,13 @@ export class NotificacionesComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
 
-  constructor(private notificationService: NotificacionesService) {}
+  constructor(
+    private notificationService: NotificacionesService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.userID = localStorage.getItem('user_id') || '';
+    this.userID = this.authService.getUserId() || '';
     this.getNotifications(this.currentPage);
   }
 

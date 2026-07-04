@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { Reseña, ReseñasResponse } from '../../models/models';
+import { dedupSearch } from '../../utils/search';
 
 @Component({
   selector: 'app-review',
@@ -104,42 +105,11 @@ export class ReviewComponent implements OnInit{
 
   handleSearch(query:string) {
     if (query) {
-      const lowerQuery = query.toLowerCase();
-
-      const paramsList = [
-        { titulo_libro: query },
-        { nombre_usuario: query }
+      const queries = [
+        this.reviewService.getReviews(1, { titulo_libro: query }),
+        this.reviewService.getReviews(1, { nombre_usuario: query })
       ];
-
-      const allResults: Reseña[] = [];
-      const seenIds = new Set<number>();
-      let pending = paramsList.length;
-
-      for ( const params of paramsList) {
-        this.reviewService.getReviews(1, params).subscribe(
-          (response: ReseñasResponse) => {
-            if (response && response.reseñas) {
-              for (const reseña of response.reseñas) {
-                if(!seenIds.has(reseña.id)) {
-                  seenIds.add(reseña.id);
-                  allResults.push(reseña)
-                }
-              }
-            }
-            pending--;
-            if(pending === 0) {
-              this.filteredReviews = allResults;
-            }
-          },
-          (error) => {
-            console.error('Error de búsqueda', error);
-            pending--;
-            if (pending === 0) {
-              this.filteredReviews = allResults;
-            }
-          }
-        );
-      }
+      dedupSearch(queries, r => (r as ReseñasResponse).reseñas || [], results => this.filteredReviews = results);
     } else {
       this.filteredReviews = [...this.reviewList]
     }

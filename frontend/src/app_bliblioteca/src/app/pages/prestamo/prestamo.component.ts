@@ -4,8 +4,10 @@ import { CrearResenaComponent } from '../../components/modals/user-modals/crear-
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { PrestamosService } from '../../services/loans/prestamos.service';
 import { ReseñasService } from '../../services/reviews/reseñas.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 import { Prestamo, PrestamosResponse } from '../../models/models';
+import { dedupSearch } from '../../utils/search';
 import { ActivatedRoute } from '@angular/router';
 
 
@@ -20,6 +22,7 @@ export class PrestamoComponent implements OnInit{
     private dialog: MatDialog,
     private loanService: PrestamosService,
     private reviewService: ReseñasService,
+    private authService: AuthService,
     private sysNotificationService: SysNotificationService,
     private route: ActivatedRoute
 
@@ -34,8 +37,8 @@ export class PrestamoComponent implements OnInit{
   baseParams: any = {};
 
   ngOnInit(): void {
-    const tokenRol = localStorage.getItem('token_rol');
-    const tokenUserId = localStorage.getItem('user_id');
+    const tokenRol = this.authService.getTokenRol();
+    const tokenUserId = this.authService.getUserId();
     const routeUserId = this.route.snapshot.queryParamMap.get('idUsuario');
 
     this.baseParams = tokenRol === 'Usuario' && tokenUserId ? { idUsuario: tokenUserId } : routeUserId ? { idUsuario: routeUserId } : {};
@@ -55,42 +58,11 @@ export class PrestamoComponent implements OnInit{
 
   handleSearch(query:string) {
     if (query) {
-      const lowerQuery = query.toLowerCase();
-
-      const paramsList = [
-        { titulo_libro: query },
-        { nombre_usuario: query }
+      const queries = [
+        this.loanService.getLoans(1, { titulo_libro: query }),
+        this.loanService.getLoans(1, { nombre_usuario: query })
       ];
-
-      const allResults: Prestamo[] = [];
-      const seenIds = new Set<number>();
-      let pending = paramsList.length;
-
-      for ( const params of paramsList) {
-        this.loanService.getLoans(1, params).subscribe(
-          (response: PrestamosResponse) => {
-            if (response && response.prestamos) {
-              for (const prestamo of response.prestamos) {
-                if(!seenIds.has(prestamo.id)) {
-                  seenIds.add(prestamo.id);
-                  allResults.push(prestamo)
-                }
-              }
-            }
-            pending--;
-            if(pending === 0) {
-              this.filteredLoans = allResults;
-            }
-          },
-          (error) => {
-            console.error('Error de búsqueda', error);
-            pending--;
-            if (pending === 0) {
-              this.filteredLoans = allResults;
-            }
-          }
-        );
-      }
+      dedupSearch(queries, r => (r as PrestamosResponse).prestamos || [], results => this.filteredLoans = results);
     } else {
       this.filteredLoans = [...this.loanList]
     }
@@ -221,12 +193,5 @@ export class PrestamoComponent implements OnInit{
     }
   });
 }
-  isAdmin() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
-}
+  isAdmin() { return this.authService.isAdmin() }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PrestamosService } from '../../services/loans/prestamos.service';

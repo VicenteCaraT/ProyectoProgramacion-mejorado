@@ -4,6 +4,7 @@ import { AutorService } from '../../services/autor/autor.service';
 import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.component';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 import { Autor, AutoresResponse } from '../../models/models';
+import { dedupSearch } from '../../utils/search';
 
 @Component({
   selector: 'app-autor',
@@ -41,41 +42,12 @@ export class AutorComponent implements OnInit{
 
   handleSearch(query: string) {
     if (query) {
-      const paramsList = [
-        { nombre: query },
-        { apellido: query },
-        { apodo: query },
+      const queries = [
+        this.autorService.getAutores(1, { nombre: query }),
+        this.autorService.getAutores(1, { apellido: query }),
+        this.autorService.getAutores(1, { apodo: query }),
       ];
-
-      const allResults: Autor[] = [];
-      const seenIds = new Set<number>();
-      let pending = paramsList.length;
-
-      for (const params of paramsList) {
-        this.autorService.getAutores(1, params).subscribe(
-          (response: AutoresResponse) => {
-            if (response && response.autores) {
-              for (const autor of response.autores) {
-                if (!seenIds.has(autor.id)) {
-                  seenIds.add(autor.id);
-                  allResults.push(autor);
-                }
-              }
-            }
-            pending--;
-            if (pending === 0) {
-              this.filteredAutor = allResults;
-            }
-          },
-          (error) => {
-            console.error('Error en búsqueda:', error);
-            pending--;
-            if (pending === 0) {
-              this.filteredAutor = allResults;
-            }
-          }
-        );
-      }
+      dedupSearch(queries, r => (r as AutoresResponse).autores || [], results => this.filteredAutor = results);
     } else {
       this.filteredAutor = [...this.autorList];
     }

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { Location } from '@angular/common';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-searchbar',
@@ -15,16 +16,10 @@ export class SearchbarComponent implements OnChanges{
 
   constructor (
     private location: Location,
+    private authService: AuthService
   ) {}
 
-  isAdmin() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
+  isAdmin() { return this.authService.isAdmin() }
 
   ngOnChanges() {
     this.setFilterOptions();

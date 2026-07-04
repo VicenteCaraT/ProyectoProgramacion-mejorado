@@ -1,7 +1,8 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReseñasService } from '../../../../services/reviews/reseñas.service';
+import { formatToday } from '../../../../utils/date';
 
 @Component({
   selector: 'app-crear-resena',
@@ -34,14 +35,9 @@ export class CrearResenaComponent {
 
   saveChanges(): void {
     if (this.formResena.valid) {
-        const fechaActual = new Date();
-        const dia = String(fechaActual.getDate()).padStart(2, '0'); 
-        const mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); 
-        const anio = fechaActual.getFullYear();
-
         const formData = {
             descripcion: this.formResena.value.descripcion,
-            fecha: `${dia}-${mes}-${anio}`, // Formato 'dd-mm-aaaa'
+            fecha: formatToday(),
             valoracion: `${this.rating}/5`,
             libro: this.data.loan.libro[0].id,
             usuario: this.data.loan.usuario.id

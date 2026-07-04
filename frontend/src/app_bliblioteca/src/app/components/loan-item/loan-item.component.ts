@@ -12,23 +12,11 @@ export class LoanItemComponent {
   @Output() resena = new EventEmitter<any>();
   @Output() actionEvent = new EventEmitter<{action: string, loan: any}>();
 
-  isAdmin() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
+  constructor(private authService: AuthService) {}
 
-  isUser() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Usuario")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
+  isAdmin() { return this.authService.isAdmin() }
+
+  isUser() { return this.authService.isUser() }
 
   handleEditDelete(action: string) {
     this.actionEvent.emit({ action, loan: this.loan });

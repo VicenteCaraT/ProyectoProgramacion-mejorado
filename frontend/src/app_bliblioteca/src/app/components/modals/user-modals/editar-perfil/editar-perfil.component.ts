@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-editar-perfil',
@@ -13,7 +14,8 @@ export class EditarPerfilComponent {
   constructor(
     private formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<EditarPerfilComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private authService: AuthService
   ) {
     this.formPerfil = this.formBuilder.group({
       user: ['', Validators.required],
@@ -27,14 +29,7 @@ export class EditarPerfilComponent {
     })
   }
 
-  isAdmin() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
+  isAdmin() { return this.authService.isAdmin() }
   
   closeModal(): void {
     this.dialogRef.close()

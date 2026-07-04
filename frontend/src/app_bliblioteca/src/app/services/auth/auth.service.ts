@@ -26,4 +26,26 @@ export class AuthService {
     localStorage.removeItem('user_id')
     this.router.navigateByUrl("login")
   }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  getTokenRol(): string | null {
+    return localStorage.getItem('token_rol');
+  }
+
+  getUserId(): string | null {
+    return localStorage.getItem('user_id');
+  }
+
+  isAdmin(): boolean {
+    const rol = this.getTokenRol();
+    return rol !== null && rol.includes('Admin');
+  }
+
+  isUser(): boolean {
+    const rol = this.getTokenRol();
+    return rol !== null && rol.includes('Usuario');
+  }
 }

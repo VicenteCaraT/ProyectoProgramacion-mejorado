@@ -1,9 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, Validator, Validators, ValidatorFn } from '@angular/forms';
-
-const onlyLetters: ValidatorFn = Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/);
-const onlyNumbers: ValidatorFn = Validators.pattern(/^\d+$/);
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../../services/auth/auth.service';
+import { onlyLetters, onlyNumbers, allowOnlyLetters, allowOnlyNumbers } from '../../../utils/validators';
+import { formatToIso } from '../../../utils/date';
 
 @Component({
   selector: 'app-abm-modal',
@@ -18,7 +18,8 @@ export class AbmModalComponent {
   constructor(
     private formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<AbmModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private authService: AuthService
   ) {
     this.formOperation = this.data.formOperation || 'create';
     this.formControl(this.data.formType);
@@ -43,8 +44,8 @@ export class AbmModalComponent {
         this.formEntity = this.formBuilder.group({
           usuario: [this.formOperation === 'edit' ? this.data.usuario.id : '', [Validators.required, onlyNumbers]],
           libro: [this.formOperation === 'edit' ? this.data.libro[0].id : '', [Validators.required, onlyNumbers]],
-          inicio_prestamo: [this.formatDate(this.data.inicio_prestamo) || '', Validators.required],
-          fin_prestamo: [this.formatDate(this.data.fin_prestamo) || '', Validators.required],
+          inicio_prestamo: [formatToIso(this.data.inicio_prestamo) || '', Validators.required],
+          fin_prestamo: [formatToIso(this.data.fin_prestamo) || '', Validators.required],
           estado: [this.data.estado || '', Validators.required]
         })
         break;
@@ -92,14 +93,7 @@ export class AbmModalComponent {
     }
   }
 
-  isAdmin() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
+  isAdmin() { return this.authService.isAdmin() }
 
   closeModal(): void {
     this.dialogRef.close(null);
@@ -109,19 +103,13 @@ export class AbmModalComponent {
     this.dialogRef.close(formData);
   }
 
-  formatDate(dateString: string | undefined): string {
-    if (!dateString || !dateString.includes('-')) return '';
-    const [day, month, year] = dateString.split('-');
-    return `${year}-${month}-${day}`;
-  }
-
   saveChanges(): void {
     if (this.formEntity.valid) {
       const formData = { ...this.formEntity.value };
 
       if (this.data.formType === 'loan') {
-        formData.inicio_prestamo = this.formatDate(formData.inicio_prestamo);
-        formData.fin_prestamo = this.formatDate(formData.fin_prestamo);
+        formData.inicio_prestamo = formatToIso(formData.inicio_prestamo);
+        formData.fin_prestamo = formatToIso(formData.fin_prestamo);
 
         formData.libro = [formData.libro];
       }
@@ -130,19 +118,7 @@ export class AbmModalComponent {
     }
   }
 
-  allowOnlyLetters(event: KeyboardEvent) {
-    const pattern = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
-    const inputChar = String.fromCharCode(event.keyCode || event.which);
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
-    }
-  }
+  allowOnlyLetters = allowOnlyLetters;
 
-  allowOnlyNumbers(event: KeyboardEvent) {
-    const pattern = /^[0-9]*$/;
-    const inputChar = String.fromCharCode(event.keyCode || event.which);
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
-    }
-  }
+  allowOnlyNumbers = allowOnlyNumbers;
 }

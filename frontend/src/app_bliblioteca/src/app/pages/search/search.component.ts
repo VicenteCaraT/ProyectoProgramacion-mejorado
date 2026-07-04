@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { LibrosService } from '../../services/books/libros.service';
 import { Router } from '@angular/router';
 import { Libro, LibrosResponse } from '../../models/models';
+import { dedupSearch } from '../../utils/search';
 
 @Component({
   selector: 'app-search',
@@ -20,47 +21,16 @@ export class SearchComponent {
 
   handleSearch(query: string) {
     if (query) {
-      const lowerQuery = query.toLowerCase();
-
-      const paramsList = [
-        { titulo: query },
-        { autor: query },
-        { genero: query },
-        { editorial: query }
+      const queries = [
+        this.bookService.getBooks(1, { titulo: query }),
+        this.bookService.getBooks(1, { autor: query }),
+        this.bookService.getBooks(1, { genero: query }),
+        this.bookService.getBooks(1, { editorial: query })
       ];
-
-      const allResults: Libro[] = [];
-      const seenIds = new Set();
-      let pending = paramsList.length;
-
-      for (const params of paramsList) {
-        this.bookService.getBooks(1, params).subscribe(
-          (response: LibrosResponse) => {
-            if (response && response.libros) {
-              for (const libro of response.libros) {
-                if (!seenIds.has(libro.id)) {
-                  seenIds.add(libro.id);
-                  allResults.push(libro);
-                }
-              }
-            }
-
-            pending--;
-            if (pending === 0) {
-              this.searchResults = allResults;
-              this.showDropdown = this.searchResults.length > 0;
-            }
-          },
-          (error) => {
-            console.error('Error al buscar libros:', error);
-            pending--;
-            if (pending === 0) {
-              this.searchResults = allResults;
-              this.showDropdown = this.searchResults.length > 0;
-            }
-          }
-        );
-      }
+      dedupSearch(queries, r => (r as LibrosResponse).libros || [], results => {
+        this.searchResults = results;
+        this.showDropdown = results.length > 0;
+      });
     } else {
       this.showDropdown = false;
       this.searchResults = [];

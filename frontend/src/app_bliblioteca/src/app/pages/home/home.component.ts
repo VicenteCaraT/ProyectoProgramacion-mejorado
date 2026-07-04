@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BookModalComponent } from '../../components/modals/book-modal/book-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { LibrosService } from '../../services/books/libros.service';

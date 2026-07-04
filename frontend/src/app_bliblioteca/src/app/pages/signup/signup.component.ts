@@ -1,14 +1,10 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
-import { jwtDecode } from 'jwt-decode';
 import { RegisterService } from '../../services/auth/register.service';
 import { Usuario } from '../../models/models';
-
-
-const onlyLetters: ValidatorFn = Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/);
-const onlyNumbers: ValidatorFn = Validators.pattern(/^\d+$/);
+import { onlyLetters, onlyNumbers, allowOnlyLetters, allowOnlyNumbers } from '../../utils/validators';
 
 @Component({
   selector: 'app-signup',
@@ -60,19 +56,7 @@ export class SignupComponent {
     }   
   }
 
-  allowOnlyLetters(event: KeyboardEvent) {
-    const pattern = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
-    const inputChar = String.fromCharCode(event.keyCode || event.which);
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
-    }
-  }
+  allowOnlyLetters = allowOnlyLetters;
 
-  allowOnlyNumbers(event: KeyboardEvent) {
-    const pattern = /^[0-9]*$/;
-    const inputChar = String.fromCharCode(event.keyCode || event.which);
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
-    }
-  }
+  allowOnlyNumbers = allowOnlyNumbers;
 }

@@ -13,14 +13,7 @@ export class AddIconComponent {
     private authService: AuthService
   ) { }
 
-  isAdmin() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
+  isAdmin() { return this.authService.isAdmin() }
 
   addClick() {
     this.addEvent.emit();

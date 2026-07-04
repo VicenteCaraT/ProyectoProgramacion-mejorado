@@ -1,7 +1,5 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { PrestamosService } from '../../../services/loans/prestamos.service';
-import { AuthService } from '../../../services/auth/auth.service';
 import { Router } from '@angular/router';
 
 @Component({

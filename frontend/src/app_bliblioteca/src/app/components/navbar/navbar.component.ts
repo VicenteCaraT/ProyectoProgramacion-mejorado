@@ -15,6 +15,7 @@ export class NavbarComponent implements OnInit{
   user: Usuario | null = null;
 
   constructor(
+    private authService: AuthService,
     private usuarioService: UsuariosService,
     private dialog: MatDialog, 
     private router: Router
@@ -25,40 +26,23 @@ export class NavbarComponent implements OnInit{
   }
 
   loadUserData(){
-    const userId = localStorage.getItem('user_id');
+    const userId = this.authService.getUserId();
     if (userId) {
       this.usuarioService.getUserById(Number(userId)).subscribe({
         next: (userData) => {
           this.user = userData;
         },
-        error: (err) => {
-        }
+        error: () => {}
       });
     }
   }
 
+  isAdmin() { return this.authService.isAdmin() }
 
-  isAdmin() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Admin")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
-
-  isUser() { 
-    const tokenRol = localStorage.getItem('token_rol');
-  if (tokenRol && tokenRol.includes("Usuario")) {
-    return true;
-  } else {
-    return false;
-  }
-  }
-
+  isUser() { return this.authService.isUser() }
 
   checkUser(event: Event): void {
-    const tokenJWT = localStorage.getItem('token'); // Suponiendo que el token se almacena como 'token'
+    const tokenJWT = this.authService.getToken();
 
     if (tokenJWT) {
       // Si hay un token, redirigir a /perfil

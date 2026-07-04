@@ -4,6 +4,7 @@ import { AbmModalComponent } from '../../components/modals/abm-modal/abm-modal.c
 import { LibrosService } from '../../services/books/libros.service';
 import { SysNotificationService } from '../../services/sys-notifications/sys-notification.service';
 import { Libro, LibrosResponse } from '../../models/models';
+import { dedupSearch } from '../../utils/search';
 
 @Component({
   selector: 'app-catalogo',
@@ -39,45 +40,15 @@ export class CatalogoComponent implements OnInit{
     })
   }
 
-  // ARREGLAR ya que no filtra
   handleSearch(query: string) {
     if (query) {
-      const paramsList = [
-        { titulo: query },
-        { autor: query },
-        { genero: query },
-        { editorial: query }
+      const queries = [
+        this.bookService.getBooks(1, { titulo: query }),
+        this.bookService.getBooks(1, { autor: query }),
+        this.bookService.getBooks(1, { genero: query }),
+        this.bookService.getBooks(1, { editorial: query })
       ];
-
-      const allResults: Libro[] = [];
-      const seenIds = new Set<number>();
-      let pending = paramsList.length;
-
-      for (const params of paramsList) {
-        this.bookService.getBooks(1, params).subscribe(
-          (response: LibrosResponse) => {
-            if (response && response.libros) {
-              for (const libro of response.libros) {
-                if (!seenIds.has(libro.id)) {
-                  seenIds.add(libro.id);
-                  allResults.push(libro);
-                }
-              }
-            }
-            pending--;
-            if (pending === 0) {
-              this.filteredBook = allResults;
-            }
-          },
-          (error) => {
-            console.error('Error en búsqueda:', error);
-            pending--;
-            if (pending === 0) {
-              this.filteredBook = allResults;
-            }
-          }
-        );
-      }
+      dedupSearch(queries, r => (r as LibrosResponse).libros || [], results => this.filteredBook = results);
     } else {
       this.filteredBook = [...this.bookList];
     }

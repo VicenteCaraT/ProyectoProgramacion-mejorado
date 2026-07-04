@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-edit-delete',
@@ -11,16 +12,10 @@ export class EditDeleteComponent {
   @Input() isReviewPage: boolean = false;
   @Output() editDelete = new EventEmitter<string>();
 
+  constructor(private authService: AuthService) {}
 
   isAdminOrReview() {
-    const tokenRol = localStorage.getItem('token_rol');
-
-    // Mostrar botones si es Admin o si es la página de reseñas
-    if ((tokenRol && tokenRol.includes("Admin")) || this.isReviewPage) {
-      return true;
-    } else {
-      return false;
-    }
+    return this.authService.isAdmin() || this.isReviewPage;
   }
 
   isPending() {
